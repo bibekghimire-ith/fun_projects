@@ -1,0 +1,318 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
+enum EventType {
+  BIRTHDAY
+  ANNIVERSARY
+  VALENTINES
+  CUSTOM
+}
+
+enum ExperienceStatus {
+  DRAFT
+  PUBLISHED
+  UNPUBLISHED
+  REVOKED
+}
+
+enum BlockType {
+  TEXT
+  HEADING
+  IMAGE
+  GALLERY
+  VIDEO
+  AUDIO
+  TIMELINE
+  QUOTE
+  DIVIDER
+  COUNTDOWN
+  OPEN_WHEN
+  FUTURE_LETTER
+  FINAL_QUESTION
+  BUTTON
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+  AUDIO
+}
+
+enum UnlockType {
+  IMMEDIATE
+  DATE_LOCKED
+  MANUAL
+}
+
+enum ResponseType {
+  YES_NO
+  SINGLE_BUTTON
+  MULTIPLE_CHOICE
+  TEXT_INPUT
+}
+
+enum AnimationLevel {
+  NONE
+  MINIMAL
+  NORMAL
+  RICH
+}
+
+enum AuditAction {
+  EXPERIENCE_CREATED
+  EXPERIENCE_UPDATED
+  EXPERIENCE_PUBLISHED
+  EXPERIENCE_UNPUBLISHED
+  EXPERIENCE_REVOKED
+  MEDIA_UPLOADED
+  MEDIA_DELETED
+  PIN_ENABLED
+  PIN_DISABLED
+  RESPONSE_RECEIVED
+}
+
+// ─── Models ───────────────────────────────────────────────────────────────────
+
+model User {
+  id           String       @id @default(uuid())
+  email        String       @unique
+  passwordHash String
+  name         String
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  experiences  Experience[]
+  auditLogs    AuditLog[]
+
+  @@map("users")
+}
+
+model Experience {
+  id              String              @id @default(uuid())
+  userId          String
+  user            User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title           String
+  recipientName   String
+  eventType       EventType
+  eventDate       DateTime?
+  openingMessage  String?
+  closingMessage  String?
+  status          ExperienceStatus    @default(DRAFT)
+  publicToken     String              @unique
+  pinHash         String?
+  pinEnabled      Boolean             @default(false)
+  themeId         String?
+  theme           Theme?              @relation(fields: [themeId], references: [id])
+  coverMediaId    String?
+  musicMediaId    String?
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  sections        ExperienceSection[]
+  media           Media[]
+  memories        Memory[]
+  openWhenMessages OpenWhenMessage[]
+  futureLetter    FutureLetter?
+  finalSurprise   FinalSurprise?
+  responses       Response[]
+  accessLogs      ExperienceAccess[]
+  auditLogs       AuditLog[]
+
+  @@index([userId])
+  @@index([publicToken])
+  @@index([status])
+  @@map("experiences")
+}
+
+model ExperienceSection {
+  id           String         @id @default(uuid())
+  experienceId String
+  experience   Experience     @relation(fields: [experienceId], references: [id], onDelete: Cascade)
+  title        String
+  order        Int            @default(0)
+  enabled      Boolean        @default(true)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  blocks       ContentBlock[]
+
+  @@index([experienceId])
+  @@map("experience_sections")
+}
+
+model ContentBlock {
+  id        String            @id @default(uuid())
+  sectionId String
+  section   ExperienceSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  type      BlockType
+  order     Int               @default(0)
+  enabled   Boolean           @default(true)
+  content   Json              @default("{}")
+  mediaId   String?
+  media     Media?            @relation(fields: [mediaId], references: [id])
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+
+  @@index([sectionId])
+  @@map("content_blocks")
+}
+
+model Media {
+  id             String         @id @default(uuid())
+  experienceId   String
+  experience     Experience     @relation(fields: [experienceId], references: [id], onDelete: Cascade)
+  type           MediaType
+  originalName   String
+  storagePath    String
+  thumbnailPath  String?
+  mimeType       String
+  size           Int
+  width          Int?
+  height         Int?
+  duration       Int?
+  createdAt      DateTime       @default(now())
+  contentBlocks  ContentBlock[]
+  openWhenMessages OpenWhenMessage[] @relation("OpenWhenMedia")
+  futureLetter   FutureLetter?  @relation("FutureLetterMedia")
+  finalSurprise  FinalSurprise? @relation("FinalSurpriseMedia")
+  memories       Memory[]       @relation("MemoryMedia")
+
+  @@index([experienceId])
+  @@map("media")
+}
+
+model Memory {
+  id           String     @id @default(uuid())
+  experienceId String
+  experience   Experience @relation(fields: [experienceId], references: [id], onDelete: Cascade)
+  date         DateTime
+  title        String
+  description  String?
+  location     String?
+  order        Int        @default(0)
+  mediaId      String?
+  media        Media?     @relation("MemoryMedia", fields: [mediaId], references: [id])
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@index([experienceId])
+  @@map("memories")
+}
+
+model OpenWhenMessage {
+  id           String     @id @default(uuid())
+  experienceId String
+  experience   Experience @relation(fields: [experienceId], references: [id], onDelete: Cascade)
+  label        String
+  emoji        String?
+  content      String
+  mediaId      String?
+  media        Media?     @relation("OpenWhenMedia", fields: [mediaId], references: [id])
+  unlockType   UnlockType @default(IMMEDIATE)
+  unlockDate   DateTime?
+  isOneTime    Boolean    @default(false)
+  openedAt     DateTime?
+  order        Int        @default(0)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@index([experienceId])
+  @@map("open_when_messages")
+}
+
+model FutureLetter {
+  id           String     @id @default(uuid())
+  experienceId String     @unique
+  experience   Experience @relation(fields: [experienceId], references: [id], onDelete: Cascade)
+  title        String
+  content      String
+  unlockDate   DateTime
+  mediaId      String?
+  media        Media?     @relation("FutureLetterMedia", fields: [mediaId], references: [id])
+  unlockedAt   DateTime?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@index([unlockDate])
+  @@map("future_letters")
+}
+
+model FinalSurprise {
+  id             String       @id @default(uuid())
+  experienceId   String       @unique
+  experience     Experience   @relation(fields: [experienceId], references: [id], onDelete: Cascade)
+  question       String
+  buttonText     String       @default("Reveal")
+  successMessage String
+  responseType   ResponseType @default(YES_NO)
+  options        Json?
+  mediaId        String?
+  media          Media?       @relation("FinalSurpriseMedia", fields: [mediaId], references: [id])
+  ctaText        String?
+  ctaUrl         String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@map("final_surprises")
+}
+
+model Theme {
+  id              String         @id @default(uuid())
+  name            String
+  slug            String         @unique
+  isBuiltIn       Boolean        @default(false)
+  primaryColor    String
+  secondaryColor  String
+  backgroundColor String
+  surfaceColor    String
+  textColor       String
+  fontFamily      String         @default("'Inter', sans-serif")
+  borderRadius    String         @default("0.75rem")
+  animationLevel  AnimationLevel @default(NORMAL)
+  experiences     Experience[]
+
+  @@map("themes")
+}
+
+model Response {
+  id           String     @id @default(uuid())
+  experienceId String
+  experience   Experience @relation(fields: [experienceId], references: [id], onDelete: Cascade)
+  answer       String
+  respondedAt  DateTime   @default(now())
+
+  @@index([experienceId])
+  @@map("responses")
+}
+
+model ExperienceAccess {
+  id           String     @id @default(uuid())
+  experienceId String
+  experience   Experience @relation(fields: [experienceId], references: [id], onDelete: Cascade)
+  ipHash       String?
+  userAgent    String?
+  accessedAt   DateTime   @default(now())
+
+  @@index([experienceId])
+  @@map("experience_accesses")
+}
+
+model AuditLog {
+  id           String      @id @default(uuid())
+  userId       String?
+  user         User?       @relation(fields: [userId], references: [id])
+  experienceId String?
+  experience   Experience? @relation(fields: [experienceId], references: [id])
+  action       AuditAction
+  metadata     Json?
+  createdAt    DateTime    @default(now())
+
+  @@index([userId])
+  @@index([experienceId])
+  @@map("audit_logs")
+}

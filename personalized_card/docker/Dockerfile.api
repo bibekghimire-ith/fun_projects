@@ -1,0 +1,43 @@
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+RUN apk add --no-cache openssl libc6-compat python3 make g++
+RUN npm install -g pnpm@9
+
+COPY pnpm-workspace.yaml package.json pnpm-lock.yaml* tsconfig.base.json ./
+COPY packages/types/package.json ./packages/types/
+COPY packages/validation/package.json ./packages/validation/
+COPY apps/api/package.json ./apps/api/
+COPY prisma/ ./prisma/
+
+RUN pnpm install --frozen-lockfile
+
+COPY packages/ ./packages/
+COPY apps/api/ ./apps/api/
+
+RUN pnpm --filter types build
+RUN pnpm --filter validation build
+RUN pnpm --filter api db:generate
+RUN pnpm --filter api build
+
+FROM node:20-alpine AS runner
+
+WORKDIR /app
+RUN apk add --no-cache openssl libc6-compat
+RUN npm install -g pnpm@9 prisma@5.22.0
+
+COPY --from=builder /app/pnpm-workspace.yaml ./
+COPY --from=builder /app/package.json ./
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/packages ./packages
+COPY --from=builder /app/apps/api/package.json ./apps/api/
+COPY --from=builder /app/apps/api/node_modules ./apps/api/node_modules
+COPY --from=builder /app/apps/api/dist ./apps/api/dist
+COPY --from=builder /app/prisma ./prisma
+COPY docker/api-entrypoint.sh /api-entrypoint.sh
+RUN chmod +x /api-entrypoint.sh
+
+ENV NODE_ENV=production
+EXPOSE 4000
+
+ENTRYPOINT ["/api-entrypoint.sh"]

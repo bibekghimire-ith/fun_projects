@@ -1,0 +1,27 @@
+{
+  "name": "a-letter-from-me",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"pnpm --filter api dev\" \"pnpm --filter web dev\"",
+    "build": "pnpm --filter types build && pnpm --filter validation build && pnpm --filter api build && pnpm --filter web build",
+    "lint": "eslint . --ext .ts,.tsx --ignore-pattern '**/node_modules/**' --ignore-pattern '**/dist/**'",
+    "typecheck": "pnpm --recursive typecheck",
+    "test": "pnpm --filter api test",
+    "test:e2e": "pnpm --filter tests-e2e test",
+    "format": "prettier --write .",
+    "db:migrate": "pnpm --filter api db:migrate",
+    "db:seed": "pnpm --filter api db:seed",
+    "db:reset": "pnpm --filter api db:reset",
+    "db:studio": "pnpm --filter api db:studio"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0",
+    "concurrently": "^8.2.2",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.3.3",
+    "typescript": "^5.4.0"
+  }
+}
