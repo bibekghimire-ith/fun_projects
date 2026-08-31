@@ -1,0 +1,103 @@
+{
+  "slug": "thank-you",
+  "name": "The thank-you letter",
+  "description": "Short and direct. Three chapters to say what someone did for you, why it mattered, and that you noticed.",
+  "tagline": "Say thank you properly",
+  "eventType": "CUSTOM",
+  "themeSlug": "memory",
+  "emoji": "🙏",
+  "tags": ["thank you", "short", "gratitude", "simple"],
+  "estimatedMinutes": 15,
+  "defaults": {
+    "title": "Thank you",
+    "openingMessage": "This is overdue.",
+    "closingMessage": "I don't think I ever said it properly. So: thank you."
+  },
+  "config": {
+    "navigationMode": "SCROLL",
+    "enableConfetti": false,
+    "copy": {
+      "envelope.title": "Something overdue.",
+      "envelope.subtitle": "It won't take long to read.",
+      "welcome.greeting": "{recipient} —",
+      "welcome.subtitle": "This is short, and I meant all of it.",
+      "closing.title": "So: thank you.",
+      "closing.replay": "Read it again"
+    },
+    "features": {
+      "timeline": false,
+      "openWhen": false,
+      "futureLetter": false,
+      "music": false
+    }
+  },
+  "sections": [
+    {
+      "title": "What you did",
+      "blocks": [
+        {
+          "type": "HEADING",
+          "content": { "text": "Thank you", "level": 1, "align": "center" }
+        },
+        {
+          "type": "TEXT",
+          "content": {
+            "text": "Start with the specific thing. Not \"you've always been there\" — the actual afternoon, the actual phone call, the actual favour.",
+            "align": "left"
+          }
+        },
+        { "type": "DIVIDER", "content": { "style": "dots" } }
+      ]
+    },
+    {
+      "title": "Why it mattered",
+      "blocks": [
+        {
+          "type": "HEADING",
+          "content": { "eyebrow": "The part I never said", "text": "Why it mattered", "level": 2 }
+        },
+        {
+          "type": "TEXT",
+          "content": {
+            "text": "Tell them what would have happened otherwise. That's the bit people rarely hear, and it's the bit that lands.",
+            "align": "left"
+          }
+        },
+        {
+          "type": "QUOTE",
+          "content": {
+            "text": "Replace this with what they said at the time, if you remember it.",
+            "attribution": "You, not making a fuss about it"
+          }
+        },
+        {
+          "type": "GALLERY",
+          "content": { "mediaIds": [], "layout": "grid", "caption": "A few photos, nothing elaborate." }
+        }
+      ]
+    },
+    {
+      "title": "That's it",
+      "blocks": [
+        {
+          "type": "TEXT",
+          "content": {
+            "text": "No favour to ask, nothing attached. Just that.",
+            "align": "center"
+          }
+        }
+      ]
+    },
+    {
+      "title": "One more thing",
+      "blocks": [{ "type": "FINAL_QUESTION", "content": { "showIntro": true } }]
+    }
+  ],
+  "finalSurprise": {
+    "question": "How are you feeling right now?",
+    "buttonText": "Tell me",
+    "successMessage": "Good. That's exactly what I was hoping for.",
+    "responseType": "MULTIPLE_CHOICE",
+    "options": ["Touched", "Surprised", "A little emotional, honestly", "Put the kettle on"]
+  }
+}

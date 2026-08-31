@@ -1,0 +1,158 @@
+{
+  "slug": "graduation-day",
+  "name": "The graduation letter",
+  "description": "For the end of something long and hard: a look back at the whole run, a photo wall, and a letter that unlocks a year into whatever comes next.",
+  "tagline": "For the end of something hard",
+  "eventType": "CUSTOM",
+  "themeSlug": "sunset",
+  "emoji": "🎓",
+  "tags": ["graduation", "milestone", "proud", "future letter"],
+  "estimatedMinutes": 35,
+  "defaults": {
+    "title": "You did it",
+    "openingMessage": "I've been writing this one in my head for a while.",
+    "closingMessage": "Whatever's next, you're ready for it. I've watched you get here."
+  },
+  "config": {
+    "navigationMode": "SCROLL",
+    "enableConfetti": true,
+    "copy": {
+      "envelope.title": "You did it.",
+      "envelope.subtitle": "I wanted to say it properly.",
+      "welcome.greeting": "{recipient}.",
+      "welcome.subtitle": "Congratulations. Now read the rest.",
+      "timeline.title": "The whole run",
+      "futureLetter.title": "Open this in five years",
+      "closing.title": "Whatever's next, you're ready for it."
+    },
+    "features": {
+      "openWhen": true,
+      "futureLetter": true
+    }
+  },
+  "sections": [
+    {
+      "title": "You did it",
+      "blocks": [
+        {
+          "type": "HEADING",
+          "content": { "eyebrow": "Chapter one", "text": "You did it", "level": 1, "align": "center" }
+        },
+        {
+          "type": "TEXT",
+          "content": {
+            "text": "Say the obvious thing first, and mean it. Then say the bit nobody else will: that you know what it cost.",
+            "align": "left"
+          }
+        },
+        {
+          "type": "COUNTDOWN",
+          "content": {
+            "targetDate": "2027-05-20T00:00:00Z",
+            "label": "Until the ceremony",
+            "completedText": "Today's the day."
+          }
+        }
+      ]
+    },
+    {
+      "title": "The whole run",
+      "blocks": [
+        {
+          "type": "HEADING",
+          "content": { "eyebrow": "Chapter two", "text": "The whole run", "level": 2 }
+        },
+        {
+          "type": "TEXT",
+          "content": {
+            "text": "Add the moments below — the year it nearly came apart belongs in there just as much as the results day.",
+            "align": "left"
+          }
+        },
+        { "type": "TIMELINE", "content": { "layout": "alternating" } }
+      ]
+    },
+    {
+      "title": "Proof",
+      "blocks": [
+        {
+          "type": "HEADING",
+          "content": { "eyebrow": "Chapter three", "text": "Proof", "level": 2 }
+        },
+        {
+          "type": "GALLERY",
+          "content": { "mediaIds": [], "layout": "grid", "caption": "Every year of it." }
+        },
+        {
+          "type": "QUOTE",
+          "content": {
+            "text": "Replace this with what they said in the worst week, when they were sure they'd fail.",
+            "attribution": "You, wrongly"
+          }
+        }
+      ]
+    },
+    {
+      "title": "What's next",
+      "blocks": [
+        {
+          "type": "HEADING",
+          "content": { "eyebrow": "Chapter four", "text": "What's next", "level": 2 }
+        },
+        { "type": "OPEN_WHEN", "content": { "title": "Open when…" } },
+        { "type": "FUTURE_LETTER", "content": { "showCountdown": true } },
+        { "type": "FINAL_QUESTION", "content": { "showIntro": true } }
+      ]
+    }
+  ],
+  "memories": [
+    {
+      "title": "The first week",
+      "description": "When none of it made sense yet.",
+      "daysAgo": 1095
+    },
+    {
+      "title": "The year it got hard",
+      "description": "Name it. Getting through it is the achievement, not the certificate.",
+      "daysAgo": 500
+    },
+    {
+      "title": "The final push",
+      "description": "The all-nighters and the person who brought food.",
+      "daysAgo": 60
+    },
+    {
+      "title": "Results",
+      "description": "Where you were standing when you found out.",
+      "daysAgo": 14
+    }
+  ],
+  "openWhen": [
+    {
+      "label": "you don't know what you're doing next",
+      "emoji": "🧭",
+      "content": "Nobody does. Say that, and say it kindly."
+    },
+    {
+      "label": "the first job is harder than expected",
+      "emoji": "💼",
+      "content": "Remind them they've already done a harder thing than this."
+    },
+    {
+      "label": "you need reminding you're capable",
+      "emoji": "⭐",
+      "content": "Be specific about the evidence. Vague praise doesn't work on people who are doubting themselves."
+    }
+  ],
+  "futureLetter": {
+    "title": "Open this in five years",
+    "content": "Write to them five years into whatever they chose. Tell them what you expect to be true, and that you'll be just as proud if none of it is.",
+    "unlockInDays": 1825
+  },
+  "finalSurprise": {
+    "question": "One more thing before you go out there.",
+    "buttonText": "See it",
+    "successMessage": "That's the spirit. Go make us proud a while longer.",
+    "responseType": "SINGLE_BUTTON"
+  }
+}

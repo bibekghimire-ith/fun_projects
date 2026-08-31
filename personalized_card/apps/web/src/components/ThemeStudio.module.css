@@ -1,0 +1,117 @@
+/* The theme editor, with the live preview beside it. */
+
+.studio {
+  display: grid;
+  gap: var(--space-5);
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  align-items: start;
+}
+
+.group {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: var(--space-4);
+}
+
+.groupTitle {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 0;
+  margin: 0;
+}
+
+.colourGrid {
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+}
+
+.pairRow {
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+}
+
+.formActions {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.previewColumn {
+  display: grid;
+  gap: var(--space-3);
+  position: sticky;
+  top: 5rem;
+}
+
+/* Everything below reads the theme's own custom properties, which ThemeScope
+   puts on the wrapper — that is the whole point of the preview. */
+
+.preview {
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  display: grid;
+  gap: var(--space-3);
+  overflow: hidden;
+}
+
+.previewEyebrow {
+  margin: 0;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.previewHeading {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  color: var(--color-text);
+}
+
+.previewText {
+  margin: 0;
+  color: var(--color-text);
+  line-height: 1.6;
+}
+
+.previewQuiet {
+  margin: 0 0 var(--space-1);
+  color: var(--color-muted);
+  font-size: 0.85rem;
+}
+
+.previewCard {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: var(--space-4);
+}
+
+.previewButton {
+  justify-self: start;
+  font: inherit;
+  font-family: var(--font-body);
+  border: 0;
+  border-radius: var(--radius);
+  padding: 0.6rem 1.1rem;
+  background: var(--color-primary);
+  color: var(--color-surface);
+  opacity: 1;
+}
+
+@media (max-width: 900px) {
+  .studio {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .previewColumn {
+    position: static;
+  }
+}

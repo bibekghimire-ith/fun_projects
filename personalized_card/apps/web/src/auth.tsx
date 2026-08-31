@@ -23,7 +23,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
     api
-      .get<{ user: User }>('/api/me')
+      .get<{ user: User }>('/api/auth/me')
       .then((d) => setUser(d.user))
       .catch(() => setToken(null))
       .finally(() => setLoading(false));

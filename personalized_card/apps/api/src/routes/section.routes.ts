@@ -2,7 +2,13 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { authenticate } from '../middleware/auth';
 import { prisma } from '../config/prisma';
 import { experienceService } from '../services/experience.service';
-import { CreateSectionSchema, UpdateSectionSchema, ReorderSchema } from '@letter/validation';
+import { templateService } from '../services/template.service';
+import {
+  ApplyPresetSchema,
+  CreateSectionSchema,
+  ReorderSchema,
+  UpdateSectionSchema,
+} from '@letter/validation';
 
 export const sectionRouter = Router();
 sectionRouter.use(authenticate);
@@ -54,6 +60,15 @@ sectionRouter.delete('/sections/:id', async (req: Request, res: Response, next: 
     await experienceService.assertOwnership(section.experienceId, req.user!.userId);
     await prisma.experienceSection.delete({ where: { id: req.params.id } });
     res.json({ success: true, data: null });
+  } catch (err) { next(err); }
+});
+
+sectionRouter.post('/sections/:id/apply-preset', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { slug } = ApplyPresetSchema.parse(req.body);
+    // Ownership is checked inside, via the section's experience.
+    const blocks = await templateService.applyPreset(req.params.id, req.user!.userId, slug);
+    res.status(201).json({ success: true, data: blocks });
   } catch (err) { next(err); }
 });
 

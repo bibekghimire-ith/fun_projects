@@ -1,0 +1,68 @@
+.toggleGrid {
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+}
+
+.range {
+  width: 100%;
+  accent-color: var(--color-ink);
+}
+
+.token {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-sm);
+  padding: 0.05rem 0.3rem;
+}
+
+.copyGroup {
+  display: grid;
+  gap: var(--space-3);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-line);
+}
+
+.copyGroupTitle {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.copyRow {
+  display: grid;
+  gap: var(--space-2);
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  align-items: start;
+}
+
+.copySide {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding-top: 1.55rem;
+}
+
+.copyPreview {
+  margin: 0;
+  flex: 1;
+  min-width: 0;
+  font-size: 0.85rem;
+  color: var(--color-muted);
+  background: var(--color-surface-raised);
+  border-radius: var(--radius-sm);
+  padding: 0.4rem 0.6rem;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 760px) {
+  .copyRow {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .copySide {
+    padding-top: 0;
+  }
+}

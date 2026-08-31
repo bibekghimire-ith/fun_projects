@@ -49,3 +49,55 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm --filter api exec prisma migrate deploy
       - run: pnpm test
+
+  e2e:
+    runs-on: ubuntu-latest
+    # E2E drives real dev servers end-to-end through a real browser. It is
+    # informative rather than a merge gate for now — flakier by nature than
+    # the unit/integration suite above, and slower — so a failure here is
+    # visible without blocking the PR.
+    continue-on-error: true
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: letter
+          POSTGRES_PASSWORD: letter
+          POSTGRES_DB: letter_e2e
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U letter -d letter_e2e"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://letter:letter@localhost:5432/letter_e2e
+      JWT_SECRET: ci-jwt-secret-minimum-32-characters-long
+      JWT_EXPIRES_IN: 15m
+      REFRESH_TOKEN_SECRET: ci-refresh-token-secret-minimum-32-ch
+      REFRESH_TOKEN_EXPIRES_IN: 7d
+      COOKIE_SECRET: ci-cookie-secret-minimum-32-characters
+      CORS_ORIGIN: http://localhost:5173
+      APP_BASE_URL: http://localhost:4000
+      WEB_BASE_URL: http://localhost:5173
+      # See tests/e2e/README.md: raised so pin.spec.ts's deliberate lockout
+      # test exercises the per-experience limit, not this coarser per-IP one.
+      PIN_VERIFY_RATE_LIMIT_MAX: 1000
+      PIN_MAX_ATTEMPTS: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter types build && pnpm --filter validation build
+      - run: pnpm --filter api db:generate
+      - run: pnpm --filter api exec prisma migrate deploy
+      - run: pnpm --filter tests-e2e exec playwright install --with-deps chromium
+      - run: pnpm test:e2e

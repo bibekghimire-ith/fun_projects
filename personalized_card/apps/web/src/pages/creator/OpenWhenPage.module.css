@@ -1,0 +1,66 @@
+.note {
+  display: grid;
+  gap: var(--space-3);
+  height: 100%;
+  align-content: start;
+}
+
+.noteHead {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.noteEmoji {
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+.noteLabel {
+  font-family: var(--font-display);
+  font-weight: 600;
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.lockFlag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.15rem 0.45rem;
+  border-radius: 99px;
+  border: 1px solid var(--color-line);
+}
+
+.lockOpen {
+  color: var(--color-success);
+  background: var(--color-surface-raised);
+}
+
+.lockShut {
+  color: var(--color-warning);
+  background: var(--color-surface-raised);
+}
+
+.noteBody {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--color-text);
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  white-space: pre-wrap;
+}
+
+.noteMeta {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--color-muted);
+}

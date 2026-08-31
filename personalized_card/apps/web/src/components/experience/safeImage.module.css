@@ -1,0 +1,14 @@
+.image {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.placeholder {
+  display: block;
+  width: 100%;
+  min-height: 10rem;
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+}

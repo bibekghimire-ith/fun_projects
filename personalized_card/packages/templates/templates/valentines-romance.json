@@ -1,0 +1,136 @@
+{
+  "slug": "valentines-romance",
+  "name": "The valentine",
+  "description": "Short, warm and unhurried — a handful of chapters, a voice note and one question at the end.",
+  "tagline": "Say it properly, for once",
+  "eventType": "VALENTINES",
+  "themeSlug": "midnight",
+  "emoji": "🌹",
+  "tags": ["valentines", "romantic", "short", "voice"],
+  "estimatedMinutes": 25,
+  "defaults": {
+    "title": "For you, on Valentine's",
+    "openingMessage": "A card felt like not enough this year.",
+    "closingMessage": "That's all of it. I meant every word."
+  },
+  "config": {
+    "navigationMode": "SCROLL",
+    "enableConfetti": true,
+    "copy": {
+      "envelope.title": "Happy Valentine's.",
+      "envelope.subtitle": "This one took longer than a card.",
+      "envelope.button": "Open it",
+      "welcome.greeting": "Hello, {recipient}.",
+      "welcome.subtitle": "Read it slowly, it's short.",
+      "voice.title": "Don't read this one. Press play.",
+      "closing.title": "I meant every word.",
+      "surprise.intro": "One question, and then I'll stop."
+    },
+    "features": {
+      "timeline": false,
+      "openWhen": true,
+      "voiceLetter": true
+    }
+  },
+  "sections": [
+    {
+      "title": "Hello",
+      "blocks": [
+        {
+          "type": "HEADING",
+          "content": { "text": "Happy Valentine's", "level": 1, "align": "center" }
+        },
+        {
+          "type": "TEXT",
+          "content": {
+            "text": "Replace this with the reason you made it instead of buying one. One honest sentence beats three clever ones.",
+            "align": "center"
+          }
+        },
+        { "type": "DIVIDER", "content": { "style": "hearts" } }
+      ]
+    },
+    {
+      "title": "The things I don't say",
+      "blocks": [
+        {
+          "type": "HEADING",
+          "content": { "eyebrow": "The bit that matters", "text": "Things I don't say often enough", "level": 2 }
+        },
+        {
+          "type": "TEXT",
+          "content": {
+            "text": "Three or four of them. Be specific — the way they make coffee, the thing they do when you're ill, the way they are with your family. Specific is what lands.",
+            "align": "left"
+          }
+        },
+        {
+          "type": "QUOTE",
+          "content": {
+            "text": "Replace this with something they said once that you never forgot.",
+            "attribution": "You, without realising"
+          }
+        }
+      ]
+    },
+    {
+      "title": "In your own voice",
+      "blocks": [
+        {
+          "type": "HEADING",
+          "content": { "text": "Don't read this one", "level": 2, "align": "center" }
+        },
+        {
+          "type": "AUDIO",
+          "content": {
+            "title": "A voice note",
+            "description": "Record it in one take. The stumbles are the good part.",
+            "isVoiceLetter": true
+          }
+        },
+        {
+          "type": "IMAGE",
+          "content": { "caption": "A photo of the two of you", "alt": "A photo of us", "rounded": true }
+        }
+      ]
+    },
+    {
+      "title": "For later",
+      "blocks": [
+        {
+          "type": "HEADING",
+          "content": { "text": "For the days that need it", "level": 2 }
+        },
+        { "type": "OPEN_WHEN", "content": { "title": "Open when…" } }
+      ]
+    },
+    {
+      "title": "One question",
+      "blocks": [{ "type": "FINAL_QUESTION", "content": { "showIntro": true } }]
+    }
+  ],
+  "openWhen": [
+    {
+      "label": "you're missing me",
+      "emoji": "💌",
+      "content": "Short. Warm. Say the obvious thing."
+    },
+    {
+      "label": "you need cheering up",
+      "emoji": "☀️",
+      "content": "The stupid in-joke goes here. It'll work better than anything sincere."
+    },
+    {
+      "label": "you can't sleep",
+      "emoji": "🌙",
+      "content": "A quiet memory that doesn't ask anything of them.",
+      "isOneTime": true
+    }
+  ],
+  "finalSurprise": {
+    "question": "Dinner on Friday? Just us.",
+    "buttonText": "Read the last bit",
+    "successMessage": "Good. It's booked already.",
+    "responseType": "YES_NO"
+  }
+}

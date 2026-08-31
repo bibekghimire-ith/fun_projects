@@ -6,7 +6,6 @@ import { config } from './config/env';
 import { requestLogger } from './middleware/requestLogger';
 import { errorHandler } from './middleware/errorHandler';
 import { notFound } from './middleware/notFound';
-import { authenticate } from './middleware/auth';
 
 // Routes
 import { authRouter } from './routes/auth.routes';
@@ -19,6 +18,8 @@ import { openWhenRouter } from './routes/openWhen.routes';
 import { futureLetterRouter } from './routes/futureLetter.routes';
 import { finalSurpriseRouter } from './routes/finalSurprise.routes';
 import { themeRouter } from './routes/theme.routes';
+import { templateRouter } from './routes/template.routes';
+import { configRouter } from './routes/config.routes';
 import { publicRouter } from './routes/public.routes';
 
 export function createApp() {
@@ -57,28 +58,31 @@ export function createApp() {
 
   // API routes
   app.use('/api/auth', authRouter);
-  app.get('/api/me', authenticate, async (req, res, next) => {
-    try {
-      const { prisma } = await import('./config/prisma');
-      const user = await prisma.user.findUnique({
-        where: { id: req.user!.userId },
-        select: { id: true, email: true, name: true, createdAt: true },
-      });
-      res.json({ success: true, data: { user } });
-    } catch (err) {
-      next(err);
-    }
-  });
+  // Note: the session-check endpoint is authRouter's GET /api/auth/me — there
+  // used to be a byte-for-byte duplicate of it inline here at GET /api/me,
+  // which is exactly the kind of copy that quietly drifts once one side gets
+  // a fix the other doesn't. Removed in favour of the one canonical route.
+  // Routers that serve anonymous callers must be mounted BEFORE the creator
+  // routers. Every creator router calls `router.use(authenticate)` with no
+  // path, which applies to each request entering it — and they are all mounted
+  // on the bare '/api' prefix. So a request for, say, /api/public/e/:token that
+  // reached experienceRouter first would be rejected with a 401 before ever
+  // getting to publicRouter. Order is what keeps these reachable.
+  app.use('/api/public', publicRouter);
+  app.use('/api/templates', templateRouter);
+  app.use('/api/themes', themeRouter);
+  // mediaRouter serves /media/:id/stream anonymously before its own
+  // authenticate call, so it belongs on this side of the line too.
+  app.use('/api', mediaRouter);
+
   app.use('/api', experienceRouter);
   app.use('/api', sectionRouter);
   app.use('/api', blockRouter);
-  app.use('/api', mediaRouter);
   app.use('/api', memoryRouter);
   app.use('/api', openWhenRouter);
   app.use('/api', futureLetterRouter);
   app.use('/api', finalSurpriseRouter);
-  app.use('/api/themes', themeRouter);
-  app.use('/api/public', publicRouter);
+  app.use('/api', configRouter);
 
   // Health check
   app.get('/health', (_req, res) => {

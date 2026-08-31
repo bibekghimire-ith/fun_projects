@@ -1,0 +1,191 @@
+{
+  "slug": "anniversary-timeline",
+  "name": "The anniversary timeline",
+  "description": "A year-by-year walk through everything that got you here, ending with a question about what comes next.",
+  "tagline": "Every year, laid out in order",
+  "eventType": "ANNIVERSARY",
+  "themeSlug": "paper-love",
+  "emoji": "💍",
+  "tags": ["anniversary", "timeline", "romantic", "photos"],
+  "estimatedMinutes": 50,
+  "defaults": {
+    "title": "Happy anniversary",
+    "openingMessage": "This is the long version. Get comfortable.",
+    "closingMessage": "Same time next year, and the year after that."
+  },
+  "config": {
+    "navigationMode": "CHAPTERS",
+    "enableConfetti": false,
+    "copy": {
+      "envelope.title": "It's been another year.",
+      "envelope.subtitle": "I wrote it all down this time.",
+      "welcome.greeting": "Happy anniversary, {recipient}.",
+      "welcome.subtitle": "Start at the beginning.",
+      "timeline.title": "Everything, in order",
+      "timeline.subtitle": "The short version would not have been honest.",
+      "closing.title": "Still the best thing I ever said yes to."
+    }
+  },
+  "sections": [
+    {
+      "title": "The beginning",
+      "blocks": [
+        {
+          "type": "HEADING",
+          "content": {
+            "eyebrow": "Chapter one",
+            "text": "Where it started",
+            "level": 1,
+            "align": "center"
+          }
+        },
+        {
+          "type": "TEXT",
+          "content": {
+            "text": "Write the first day here — not the polished version you tell at dinner parties, the real one. What you were wearing, what you were worried about, the thing you almost didn't say.\n\nThat's the version worth keeping.",
+            "align": "left"
+          }
+        },
+        {
+          "type": "IMAGE",
+          "content": {
+            "caption": "The earliest photo you can find",
+            "alt": "An early photo of us",
+            "fit": "cover",
+            "rounded": true
+          }
+        },
+        { "type": "DIVIDER", "content": { "style": "hearts" } }
+      ]
+    },
+    {
+      "title": "Everything since",
+      "blocks": [
+        {
+          "type": "HEADING",
+          "content": { "eyebrow": "Chapter two", "text": "Everything since", "level": 2 }
+        },
+        {
+          "type": "TEXT",
+          "content": {
+            "text": "Add a moment for each year below. Small ones count — the flat with the broken heating counts more than the holiday photos.",
+            "align": "left"
+          }
+        },
+        { "type": "TIMELINE", "content": { "layout": "alternating", "title": "Everything, in order" } }
+      ]
+    },
+    {
+      "title": "Us, in pictures",
+      "blocks": [
+        {
+          "type": "HEADING",
+          "content": { "eyebrow": "Chapter three", "text": "Us, in pictures", "level": 2 }
+        },
+        {
+          "type": "GALLERY",
+          "content": {
+            "mediaIds": [],
+            "layout": "masonry",
+            "caption": "Tap any photo to see it properly."
+          }
+        },
+        {
+          "type": "QUOTE",
+          "content": {
+            "text": "Replace this with the thing you always say to each other. The daft one. That's the one.",
+            "attribution": "Us, most days"
+          }
+        }
+      ]
+    },
+    {
+      "title": "For later",
+      "blocks": [
+        {
+          "type": "HEADING",
+          "content": { "eyebrow": "Chapter four", "text": "For the days that need it", "level": 2 }
+        },
+        { "type": "OPEN_WHEN", "content": { "title": "Open when…" } },
+        { "type": "FUTURE_LETTER", "content": { "showCountdown": true } },
+        {
+          "type": "COUNTDOWN",
+          "content": {
+            "targetDate": "2027-06-15T00:00:00Z",
+            "label": "Until the next one",
+            "completedText": "It's today."
+          }
+        }
+      ]
+    },
+    {
+      "title": "One more thing",
+      "blocks": [{ "type": "FINAL_QUESTION", "content": { "showIntro": true } }]
+    }
+  ],
+  "memories": [
+    {
+      "title": "The first time",
+      "description": "Replace this with the day it actually started, not the day it became official.",
+      "daysAgo": 2555
+    },
+    {
+      "title": "The first trip",
+      "description": "Where you went and what went wrong. Something always goes wrong.",
+      "location": "Somewhere you'd go back to",
+      "daysAgo": 2100
+    },
+    {
+      "title": "Moving in",
+      "description": "The boxes, the argument about the sofa, the first night it felt like home.",
+      "daysAgo": 1400
+    },
+    {
+      "title": "The hard stretch",
+      "description": "Name it. It belongs in the story as much as the good parts do.",
+      "daysAgo": 700
+    },
+    {
+      "title": "This year",
+      "description": "What changed, and what didn't.",
+      "daysAgo": 200
+    }
+  ],
+  "openWhen": [
+    {
+      "label": "you've had a long day",
+      "emoji": "🌙",
+      "content": "Something short and kind. They will not have the energy to read a lot."
+    },
+    {
+      "label": "we've argued",
+      "emoji": "🕊️",
+      "content": "Write this one while you're getting on well. That's the whole point of it."
+    },
+    {
+      "label": "you need reminding",
+      "emoji": "💌",
+      "content": "The plain version. No jokes in this one.",
+      "unlockType": "IMMEDIATE"
+    },
+    {
+      "label": "it's been a year",
+      "emoji": "🎈",
+      "content": "A note for a year from now.",
+      "unlockType": "DATE_LOCKED",
+      "unlockInDays": 365,
+      "isOneTime": true
+    }
+  ],
+  "futureLetter": {
+    "title": "Read this on our next anniversary",
+    "content": "Write to the two of you a year from now. Guess at what will have happened. Being wrong is half the fun of reading it back.",
+    "unlockInDays": 365
+  },
+  "finalSurprise": {
+    "question": "Another year?",
+    "buttonText": "Open the last one",
+    "successMessage": "Good answer.",
+    "responseType": "YES_NO"
+  }
+}

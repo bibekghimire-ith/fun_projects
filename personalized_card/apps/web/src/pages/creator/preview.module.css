@@ -1,0 +1,102 @@
+.page {
+  min-height: 100vh;
+  background: var(--color-surface-raised);
+  display: flex;
+  flex-direction: column;
+}
+
+.bar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-line);
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.back:hover {
+  border-color: var(--color-line-strong);
+}
+
+.note {
+  margin: 0;
+  flex: 1 1 16rem;
+  min-width: 0;
+  font-size: 0.82rem;
+  color: var(--color-muted);
+}
+
+.frames {
+  display: inline-flex;
+  gap: var(--space-1);
+  padding: 2px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+}
+
+.frameButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 40px;
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-muted);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.frameActive {
+  background: var(--color-ink);
+  color: var(--color-on-ink);
+}
+
+.stage {
+  flex: 1 1 auto;
+  display: block;
+}
+
+.stagePhone {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-5) var(--space-4) var(--space-6);
+}
+
+.device {
+  width: 100%;
+  background: var(--color-surface);
+}
+
+.devicePhone {
+  width: min(100%, 24rem);
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  /* Tall enough to read, short enough to keep the chrome in view. */
+  height: min(78vh, 52rem);
+  overflow-y: auto;
+}
+
+.canvas {
+  min-height: 100%;
+}

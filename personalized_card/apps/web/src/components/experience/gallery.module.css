@@ -1,0 +1,154 @@
+.wrap {
+  margin: 0;
+}
+
+.grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+@media (min-width: 40rem) {
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+}
+
+.masonry .cell:nth-child(4n + 1) .thumbButton {
+  aspect-ratio: 3 / 4;
+}
+
+.carousel {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 0.5rem;
+}
+
+.carousel .cell {
+  flex: 0 0 72%;
+  scroll-snap-align: center;
+}
+
+@media (min-width: 40rem) {
+  .carousel .cell {
+    flex-basis: 40%;
+  }
+}
+
+.cell {
+  margin: 0;
+  min-width: 0;
+}
+
+.thumbButton {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  overflow: hidden;
+  cursor: pointer;
+  aspect-ratio: 1 / 1;
+  transition: opacity var(--duration) ease, transform var(--duration) ease;
+}
+
+.thumbButton:hover {
+  opacity: 0.9;
+}
+
+.thumbButton:active {
+  transform: scale(0.985);
+}
+
+.thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.caption {
+  margin: 0.75rem 0 0;
+  font-size: 0.9rem;
+  color: var(--color-muted);
+  text-align: center;
+}
+
+/* ── Lightbox ───────────────────────────────────────────────────────────── */
+
+.lightbox {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  background: var(--color-background);
+  padding: max(0.75rem, env(safe-area-inset-top)) 0.75rem max(0.75rem, env(safe-area-inset-bottom));
+  gap: 0.75rem;
+}
+
+.figure {
+  margin: 0;
+  display: grid;
+  place-items: center;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.full {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  object-fit: contain;
+  border-radius: var(--radius);
+}
+
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.count {
+  font-size: 0.85rem;
+  color: var(--color-muted);
+  min-width: 5rem;
+  text-align: center;
+}
+
+.control {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.close {
+  justify-self: end;
+  margin-left: auto;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}

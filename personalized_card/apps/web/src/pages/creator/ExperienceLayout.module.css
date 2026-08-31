@@ -1,0 +1,87 @@
+.frame {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.centered {
+  display: grid;
+  place-items: center;
+  min-height: 40vh;
+}
+
+.head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.headText {
+  min-width: 0;
+}
+
+.title {
+  font-size: 1.45rem;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.subtitle {
+  color: var(--color-muted);
+  margin: var(--space-1) 0 0;
+}
+
+.shareLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 0.85rem;
+  padding: 0.35rem 0.65rem;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  text-decoration: none;
+  color: var(--color-text);
+}
+
+.shareLink:hover {
+  border-color: var(--color-line-strong);
+  background: var(--color-surface-raised);
+}
+
+.tabs {
+  border-bottom: 1px solid var(--color-line);
+  /* At 380px there is no room for eleven tabs — they scroll instead of wrap. */
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
+.tabList {
+  display: flex;
+  gap: var(--space-4);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  min-width: max-content;
+}
+
+.tab {
+  display: inline-block;
+  padding: var(--space-2) 0 var(--space-3);
+  font-size: 0.9rem;
+  color: var(--color-muted);
+  text-decoration: none;
+  white-space: nowrap;
+  border-bottom: 2px solid transparent;
+}
+
+.tab:hover {
+  color: var(--color-text);
+}
+
+.tabActive {
+  color: var(--color-text);
+  font-weight: 600;
+  border-bottom-color: var(--color-ink);
+}

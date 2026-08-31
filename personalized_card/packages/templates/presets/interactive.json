@@ -1,0 +1,49 @@
+[
+  {
+    "slug": "open-when-grid",
+    "name": "Open when… grid",
+    "description": "Every sealed note on the experience, as a grid of envelopes.",
+    "emoji": "✉️",
+    "category": "Interactive",
+    "blocks": [
+      { "type": "HEADING", "content": { "text": "For the days that need it", "level": 2, "align": "left" } },
+      {
+        "type": "TEXT",
+        "content": { "text": "These are sealed. Open one when the label fits.", "align": "center" }
+      },
+      { "type": "OPEN_WHEN", "content": { "title": "Open when…" } }
+    ]
+  },
+  {
+    "slug": "future-letter-reveal",
+    "name": "Future letter reveal",
+    "description": "The letter that unlocks later, with a countdown to the day.",
+    "emoji": "🔒",
+    "category": "Interactive",
+    "blocks": [
+      { "type": "HEADING", "content": { "text": "One more thing…", "level": 2, "align": "center" } },
+      { "type": "FUTURE_LETTER", "content": { "showCountdown": true } }
+    ]
+  },
+  {
+    "slug": "final-question",
+    "name": "The final surprise",
+    "description": "The reveal and the question at the end, pulled from the experience's final surprise.",
+    "emoji": "🎁",
+    "category": "Interactive",
+    "blocks": [{ "type": "FINAL_QUESTION", "content": { "showIntro": true } }]
+  },
+  {
+    "slug": "link-button",
+    "name": "Call to action",
+    "description": "A button that sends them somewhere else — a playlist, a booking, a shared album.",
+    "emoji": "🔘",
+    "category": "Interactive",
+    "blocks": [
+      {
+        "type": "BUTTON",
+        "content": { "text": "Have a look", "url": "https://example.com", "style": "primary" }
+      }
+    ]
+  }
+]

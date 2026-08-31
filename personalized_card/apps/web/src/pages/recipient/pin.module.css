@@ -1,0 +1,116 @@
+.page {
+  display: block;
+}
+
+.stage {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1.5rem calc(2.5rem + env(safe-area-inset-bottom));
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  text-align: center;
+  width: min(100%, 24rem);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: clamp(1.6rem, 7vw, 2.1rem);
+  line-height: 1.2;
+  font-weight: 500;
+  text-wrap: balance;
+}
+
+.subtitle {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.98rem;
+  max-width: 30ch;
+}
+
+/* One real field, four drawn cells. */
+.field {
+  position: relative;
+  width: 100%;
+  margin-top: 0.75rem;
+}
+
+.input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  border: 0;
+  padding: 0;
+  font-size: 1.5rem;
+  letter-spacing: 1.5rem;
+  text-align: center;
+  background: transparent;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.cells {
+  display: flex;
+  justify-content: center;
+  gap: 0.6rem;
+}
+
+.cell {
+  display: grid;
+  place-items: center;
+  width: 3.25rem;
+  height: 3.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  font-size: 1.6rem;
+  line-height: 1;
+  color: var(--color-text);
+  transition: border-color var(--duration) ease;
+}
+
+.filled {
+  border-color: var(--color-primary);
+}
+
+.field:focus-within .active {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 22%, transparent);
+}
+
+.status {
+  margin: 0;
+  min-height: 1.4rem;
+  font-size: 0.9rem;
+  color: var(--color-muted);
+}
+
+.unlock {
+  margin-top: 0.5rem;
+  width: 100%;
+  min-height: 48px;
+  padding: 0.8rem 2rem;
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius);
+  background: var(--color-primary);
+  color: var(--color-surface);
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  cursor: pointer;
+  transition: opacity var(--duration) ease;
+}
+
+.unlock:disabled {
+  opacity: 0.45;
+  cursor: default;
+}

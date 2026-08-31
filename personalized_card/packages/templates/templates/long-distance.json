@@ -1,0 +1,187 @@
+{
+  "slug": "long-distance",
+  "name": "The long-distance letter",
+  "description": "Built for the miles in between: a countdown to the next time you're together, sealed notes for the hard days, and a letter that unlocks later.",
+  "tagline": "For when you can't be there",
+  "eventType": "CUSTOM",
+  "themeSlug": "midnight",
+  "emoji": "✈️",
+  "tags": ["long distance", "countdown", "open when", "comfort"],
+  "estimatedMinutes": 40,
+  "defaults": {
+    "title": "Until I see you",
+    "openingMessage": "I couldn't be there, so I made this instead.",
+    "closingMessage": "Not long now."
+  },
+  "config": {
+    "navigationMode": "SCROLL",
+    "enableConfetti": false,
+    "copy": {
+      "envelope.title": "From a long way away.",
+      "envelope.subtitle": "Open it when you have a minute.",
+      "welcome.greeting": "Hi {recipient}.",
+      "welcome.subtitle": "I've been saving these up.",
+      "openWhen.title": "For the days in between",
+      "openWhen.subtitle": "Open one when the label fits.",
+      "closing.title": "Not long now.",
+      "futureLetter.countdown": "Unlocks in"
+    },
+    "features": {
+      "timeline": true,
+      "openWhen": true,
+      "futureLetter": true
+    }
+  },
+  "sections": [
+    {
+      "title": "Hello from here",
+      "blocks": [
+        {
+          "type": "HEADING",
+          "content": { "eyebrow": "Chapter one", "text": "Hello from here", "level": 1, "align": "center" }
+        },
+        {
+          "type": "TEXT",
+          "content": {
+            "text": "Write about where you are right now — the actual room, the weather, what the day sounded like. Distance shrinks when the detail is real.",
+            "align": "left"
+          }
+        },
+        {
+          "type": "COUNTDOWN",
+          "content": {
+            "targetDate": "2027-01-10T00:00:00Z",
+            "label": "Until I see you",
+            "completedText": "Today. Finally."
+          }
+        }
+      ]
+    },
+    {
+      "title": "The good bits so far",
+      "blocks": [
+        {
+          "type": "HEADING",
+          "content": { "eyebrow": "Chapter two", "text": "The good bits so far", "level": 2 }
+        },
+        { "type": "TIMELINE", "content": { "layout": "vertical" } },
+        {
+          "type": "GALLERY",
+          "content": { "mediaIds": [], "layout": "carousel", "caption": "Photos from the last stretch." }
+        }
+      ]
+    },
+    {
+      "title": "For the days in between",
+      "blocks": [
+        {
+          "type": "HEADING",
+          "content": { "eyebrow": "Chapter three", "text": "For the days in between", "level": 2 }
+        },
+        {
+          "type": "TEXT",
+          "content": {
+            "text": "These are sealed. Open one when the label fits — not before, or they stop working.",
+            "align": "center"
+          }
+        },
+        { "type": "OPEN_WHEN", "content": { "title": "Open when…" } }
+      ]
+    },
+    {
+      "title": "One for later",
+      "blocks": [
+        { "type": "FUTURE_LETTER", "content": { "showCountdown": true } },
+        { "type": "FINAL_QUESTION", "content": { "showIntro": true } }
+      ]
+    }
+  ],
+  "memories": [
+    {
+      "title": "The last time we were in the same room",
+      "description": "What you did, and the bit you keep thinking about.",
+      "daysAgo": 90
+    },
+    {
+      "title": "The call that helped",
+      "description": "The one that went on far too long and was worth every minute.",
+      "daysAgo": 45
+    },
+    {
+      "title": "Last week",
+      "description": "Something small and recent, so it doesn't all feel like history.",
+      "daysAgo": 7
+    }
+  ],
+  "openWhen": [
+    {
+      "label": "the distance feels like too much",
+      "emoji": "🌍",
+      "content": "Don't try to fix it. Just say you know, and that it's temporary.",
+      "unlockType": "IMMEDIATE"
+    },
+    {
+      "label": "you've had a bad day",
+      "emoji": "🌧️",
+      "content": "Short and warm. Nothing that needs a reply.",
+      "unlockType": "IMMEDIATE"
+    },
+    {
+      "label": "something good happened",
+      "emoji": "🎉",
+      "content": "Tell them you'd have been the first one cheering.",
+      "unlockType": "IMMEDIATE"
+    },
+    {
+      "label": "you can't sleep",
+      "emoji": "🌙",
+      "content": "A quiet one. Read it in bed with the light off.",
+      "unlockType": "IMMEDIATE",
+      "isOneTime": true
+    },
+    {
+      "label": "it's nearly time",
+      "emoji": "✈️",
+      "content": "The one for the week before you see each other.",
+      "unlockType": "DATE_LOCKED",
+      "unlockInDays": 60
+    },
+    {
+      "label": "you land",
+      "emoji": "🛬",
+      "content": "Write this for the exact moment they get off the plane, wherever it's landing.",
+      "unlockType": "IMMEDIATE"
+    },
+    {
+      "label": "you finally book the ticket",
+      "emoji": "🎫",
+      "content": "Save this to open yourself, the day the flight is actually booked.",
+      "unlockType": "MANUAL"
+    },
+    {
+      "label": "it's been three months apart",
+      "emoji": "📅",
+      "content": "Write what you'd want them to know exactly a quarter of the way through.",
+      "unlockType": "DATE_LOCKED",
+      "unlockInDays": 90
+    },
+    {
+      "label": "you're doubting this is worth it",
+      "emoji": "💭",
+      "content": "The honest one. Write it for the night they actually wonder if this makes sense.",
+      "unlockType": "IMMEDIATE",
+      "isOneTime": true
+    }
+  ],
+  "futureLetter": {
+    "title": "Read this when we're in the same place",
+    "content": "Write to the version of you both who made it through this stretch. They'll want to hear it.",
+    "unlockInDays": 240
+  },
+  "finalSurprise": {
+    "question": "Shall I book the flights?",
+    "buttonText": "One last thing",
+    "successMessage": "Booked. See you soon.",
+    "responseType": "YES_NO"
+  }
+}

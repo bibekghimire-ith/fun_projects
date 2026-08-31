@@ -1,0 +1,25 @@
+{
+  "slug": "blank-canvas",
+  "name": "Blank canvas",
+  "description": "One empty chapter and nothing else. Start from a blank page and build the whole thing yourself.",
+  "tagline": "Start from nothing",
+  "eventType": "CUSTOM",
+  "themeSlug": "minimal",
+  "emoji": "📄",
+  "tags": ["minimal", "flexible"],
+  "estimatedMinutes": 30,
+  "defaults": {
+    "title": "A letter for you",
+    "openingMessage": "I made this for you.",
+    "closingMessage": "There will always be more memories to make."
+  },
+  "sections": [
+    {
+      "title": "Chapter one",
+      "blocks": [
+        { "type": "HEADING", "content": { "text": "Chapter one", "level": 1, "align": "center" } },
+        { "type": "TEXT", "content": { "text": "Start writing here.", "align": "left" } }
+      ]
+    }
+  ]
+}

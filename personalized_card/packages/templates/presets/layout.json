@@ -1,0 +1,37 @@
+[
+  {
+    "slug": "section-break",
+    "name": "Section break",
+    "description": "A plain line between two ideas.",
+    "emoji": "➖",
+    "category": "Layout",
+    "blocks": [{ "type": "DIVIDER", "content": { "style": "line" } }]
+  },
+  {
+    "slug": "breathing-space",
+    "name": "Breathing space",
+    "description": "Empty space — no line, just room to breathe.",
+    "emoji": "🫧",
+    "category": "Layout",
+    "blocks": [{ "type": "DIVIDER", "content": { "style": "space" } }]
+  },
+  {
+    "slug": "hearts-divider",
+    "name": "Hearts divider",
+    "description": "For the romantic ones. Use it once, not four times.",
+    "emoji": "💕",
+    "category": "Layout",
+    "blocks": [{ "type": "DIVIDER", "content": { "style": "hearts" } }]
+  },
+  {
+    "slug": "chapter-transition",
+    "name": "Chapter transition",
+    "description": "A divider followed by the next chapter's title.",
+    "emoji": "📖",
+    "category": "Layout",
+    "blocks": [
+      { "type": "DIVIDER", "content": { "style": "dots" } },
+      { "type": "HEADING", "content": { "eyebrow": "Next", "text": "Write the next chapter's title here", "level": 2, "align": "center" } }
+    ]
+  }
+]

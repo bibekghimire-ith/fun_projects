@@ -8,9 +8,12 @@
     "build": "tsc -b && vite build",
     "lint": "eslint src --ext ts,tsx",
     "typecheck": "tsc --noEmit",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
+    "@letter/templates": "workspace:*",
     "@letter/types": "workspace:*",
     "@letter/validation": "workspace:*",
     "@dnd-kit/core": "^6.1.0",
@@ -34,6 +37,7 @@
     "@types/react-dom": "^18.2.22",
     "@vitejs/plugin-react": "^4.2.1",
     "typescript": "^5.2.2",
-    "vite": "^5.2.0"
+    "vite": "^5.2.0",
+    "vitest": "^1.6.0"
   }
 }

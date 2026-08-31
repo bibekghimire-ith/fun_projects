@@ -1,0 +1,88 @@
+[
+  {
+    "slug": "chapter-opener",
+    "name": "Chapter opener",
+    "description": "An eyebrow, a title and a first paragraph — the standard way to start a chapter.",
+    "emoji": "📖",
+    "category": "Writing",
+    "blocks": [
+      {
+        "type": "HEADING",
+        "content": { "eyebrow": "Chapter", "text": "A new chapter", "level": 2, "align": "left" }
+      },
+      {
+        "type": "TEXT",
+        "content": { "text": "Start writing here.", "align": "left" }
+      }
+    ]
+  },
+  {
+    "slug": "pull-quote",
+    "name": "Pull quote",
+    "description": "Something worth setting apart, with an attribution underneath.",
+    "emoji": "❝",
+    "category": "Writing",
+    "blocks": [
+      {
+        "type": "QUOTE",
+        "content": {
+          "text": "Something they said that you never forgot.",
+          "attribution": "Them, without noticing"
+        }
+      }
+    ]
+  },
+  {
+    "slug": "letter-opening",
+    "name": "Letter opening",
+    "description": "A centred greeting and an opening line, for the very top of an experience.",
+    "emoji": "✉️",
+    "category": "Writing",
+    "blocks": [
+      { "type": "HEADING", "content": { "text": "Hello, you", "level": 1, "align": "center" } },
+      {
+        "type": "TEXT",
+        "content": {
+          "text": "I could have sent a message. This felt closer to what I meant.",
+          "align": "center"
+        }
+      },
+      { "type": "DIVIDER", "content": { "style": "dots" } }
+    ]
+  },
+  {
+    "slug": "then-and-now",
+    "name": "Then and now",
+    "description": "Two short passages side by side — who they were, and who they are now.",
+    "emoji": "🔁",
+    "category": "Writing",
+    "blocks": [
+      { "type": "HEADING", "content": { "text": "Then and now", "level": 3, "align": "center" } },
+      {
+        "type": "TEXT",
+        "content": { "text": "Then: write who they were back then — one specific detail that's changed since.", "align": "left" }
+      },
+      {
+        "type": "TEXT",
+        "content": { "text": "Now: write who they are now. Let the contrast do the work — no need to spell it out.", "align": "left" }
+      }
+    ]
+  },
+  {
+    "slug": "reasons-list",
+    "name": "A list of reasons",
+    "description": "A short, specific list — the reasons, out of many, worth naming.",
+    "emoji": "🔢",
+    "category": "Writing",
+    "blocks": [
+      { "type": "HEADING", "content": { "text": "A few reasons, out of many", "level": 3, "align": "left" } },
+      {
+        "type": "TEXT",
+        "content": {
+          "text": "1. The first reason — be specific, not general.\n2. The second.\n3. The third.\n\nKeep going for as long as it's true.",
+          "align": "left"
+        }
+      }
+    ]
+  }
+]

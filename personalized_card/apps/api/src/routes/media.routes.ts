@@ -1,7 +1,9 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import multer from 'multer';
+import jwt from 'jsonwebtoken';
 import { authenticate } from '../middleware/auth';
 import { mediaService } from '../services/media.service';
+import { experienceService } from '../services/experience.service';
 import { config } from '../config/env';
 import { prisma } from '../config/prisma';
 
@@ -22,16 +24,28 @@ mediaRouter.get('/media/:id/stream', async (req: Request, res: Response, next: N
       return res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Not found' } });
     }
 
-    const authHeader = req.headers.authorization;
+    // Two ways to prove you may see a draft's media:
+    //   1. a normal bearer token (used by fetch/XHR), or
+    //   2. a short-lived media token in the query string — because an <img>,
+    //      <audio> or <video> element cannot send an Authorization header, and
+    //      the creator has to be able to see their own work before publishing.
+    // The media token is scoped to one experience, so it cannot be replayed
+    // against another, and it is not the account's access token.
     let owner = false;
+
+    const authHeader = req.headers.authorization;
     if (authHeader?.startsWith('Bearer ')) {
       try {
-        const jwt = await import('jsonwebtoken');
         const payload = jwt.verify(authHeader.slice(7), config.JWT_SECRET) as { userId: string };
         owner = payload.userId === media.experience.userId;
       } catch {
         owner = false;
       }
+    }
+
+    const mediaToken = typeof req.query.mt === 'string' ? req.query.mt : undefined;
+    if (!owner && mediaToken) {
+      owner = verifyMediaToken(mediaToken, media.experienceId);
     }
 
     if (!owner && media.experience.status !== 'PUBLISHED') {
@@ -50,7 +64,48 @@ mediaRouter.get('/media/:id/stream', async (req: Request, res: Response, next: N
   }
 });
 
+/** Signs a token that unlocks one experience's media for direct element loads. */
+export function signMediaToken(experienceId: string): string {
+  return jwt.sign({ typ: 'media', experienceId }, config.JWT_SECRET, {
+    expiresIn: `${config.MEDIA_TOKEN_MINUTES}m`,
+  });
+}
+
+function verifyMediaToken(token: string, experienceId: string): boolean {
+  try {
+    const payload = jwt.verify(token, config.JWT_SECRET) as {
+      typ?: string;
+      experienceId?: string;
+    };
+    return payload.typ === 'media' && payload.experienceId === experienceId;
+  } catch {
+    return false;
+  }
+}
+
 mediaRouter.use(authenticate);
+
+/**
+ * Hands the creator a token their <img> tags can carry as `?mt=`. Short-lived
+ * and scoped to this experience only.
+ */
+mediaRouter.get(
+  '/experiences/:id/media-token',
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      await experienceService.assertOwnership(req.params.id, req.user!.userId);
+      res.json({
+        success: true,
+        data: {
+          token: signMediaToken(req.params.id),
+          expiresInSeconds: config.MEDIA_TOKEN_MINUTES * 60,
+        },
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+);
 
 mediaRouter.get('/experiences/:id/media', async (req: Request, res: Response, next: NextFunction) => {
   try {
