@@ -1,8 +1,170 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Prisma } from '@prisma/client';
 import argon2 from 'argon2';
 import { nanoid } from 'nanoid';
+import { getTemplate } from '@letter/templates';
+import { parseBlockContent } from '@letter/validation';
+import {
+  dateFromDaysAhead,
+  memoryDate,
+  openWhenUnlockDate,
+  resolveCountdownContent,
+} from '../apps/api/src/services/template.helpers';
+import { mergeCopyOverrides, mergeFeatureOverrides } from '../apps/api/src/services/config.helpers';
 
 const prisma = new PrismaClient();
+
+/**
+ * Build a second experience straight from one of the packaged templates,
+ * the same way a creator would from the "Start a new one" gallery — sections,
+ * blocks, memories, open-when notes, the future letter, the final surprise
+ * and the config's microcopy/feature overrides, all stamped from the
+ * template's JSON via the very same pure helpers TemplateService uses
+ * (apps/api/src/services/template.helpers.ts + config.helpers.ts). Left as a
+ * DRAFT: a template applied but not yet finished is the more common state.
+ */
+async function seedTemplateExperience(userId: string) {
+  const slug = 'anniversary-timeline';
+  const template = getTemplate(slug);
+  if (!template) {
+    console.warn(`⚠️  Template "${slug}" not found — skipping the template-based sample.`);
+    return null;
+  }
+
+  // Same lookup TemplateService.apply() does: a template naming a theme that
+  // was never seeded simply leaves the experience without one.
+  const theme = await prisma.theme.findUnique({ where: { slug: template.themeSlug } });
+
+  const now = new Date();
+  const eventDate = new Date('2027-06-15');
+
+  const experience = await prisma.experience.create({
+    data: {
+      userId,
+      title: template.defaults.title,
+      recipientName: 'Priya',
+      eventType: template.eventType,
+      eventDate,
+      openingMessage: template.defaults.openingMessage ?? null,
+      closingMessage: template.defaults.closingMessage ?? null,
+      publicToken: nanoid(32),
+      templateSlug: template.slug,
+      themeId: theme?.id ?? null,
+    },
+  });
+
+  for (const [sectionOrder, section] of template.sections.entries()) {
+    await prisma.experienceSection.create({
+      data: {
+        experienceId: experience.id,
+        title: section.title,
+        order: sectionOrder,
+        enabled: section.enabled ?? true,
+        blocks: {
+          create: section.blocks.map((block, blockOrder) => ({
+            type: block.type,
+            order: blockOrder,
+            enabled: block.enabled ?? true,
+            content: parseBlockContent(
+              block.type,
+              block.type === 'COUNTDOWN'
+                ? resolveCountdownContent(block.content, eventDate, now)
+                : block.content,
+            ) as Prisma.InputJsonValue,
+          })),
+        },
+      },
+    });
+  }
+
+  if (template.memories?.length) {
+    await prisma.memory.createMany({
+      data: template.memories.map((memory, index) => ({
+        experienceId: experience.id,
+        date: memoryDate(memory, now),
+        title: memory.title,
+        description: memory.description ?? null,
+        location: memory.location ?? null,
+        order: index,
+      })),
+    });
+  }
+
+  if (template.openWhen?.length) {
+    await prisma.openWhenMessage.createMany({
+      data: template.openWhen.map((note, index) => ({
+        experienceId: experience.id,
+        label: note.label,
+        emoji: note.emoji ?? null,
+        content: note.content,
+        unlockType: note.unlockType ?? 'IMMEDIATE',
+        unlockDate: openWhenUnlockDate(note, now),
+        isOneTime: note.isOneTime ?? false,
+        order: index,
+      })),
+    });
+  }
+
+  if (template.futureLetter) {
+    await prisma.futureLetter.create({
+      data: {
+        experienceId: experience.id,
+        title: template.futureLetter.title,
+        content: template.futureLetter.content,
+        unlockDate: dateFromDaysAhead(template.futureLetter.unlockInDays, now),
+      },
+    });
+  }
+
+  if (template.finalSurprise) {
+    const surprise = template.finalSurprise;
+    await prisma.finalSurprise.create({
+      data: {
+        experienceId: experience.id,
+        question: surprise.question,
+        buttonText: surprise.buttonText ?? 'Reveal',
+        successMessage: surprise.successMessage,
+        responseType: surprise.responseType ?? 'YES_NO',
+        ctaText: surprise.ctaText ?? null,
+        ctaUrl: surprise.ctaUrl ?? null,
+        ...(surprise.options ? { options: surprise.options as Prisma.InputJsonValue } : {}),
+      },
+    });
+  }
+
+  if (template.config) {
+    await prisma.experienceConfig.create({
+      data: {
+        experienceId: experience.id,
+        ...(template.config.navigationMode ? { navigationMode: template.config.navigationMode } : {}),
+        ...(template.config.enableConfetti !== undefined
+          ? { enableConfetti: template.config.enableConfetti }
+          : {}),
+        copy: mergeCopyOverrides(
+          undefined,
+          template.config.copy as Record<string, string> | undefined,
+        ) as Prisma.InputJsonValue,
+        features: mergeFeatureOverrides(
+          undefined,
+          template.config.features as Record<string, boolean> | undefined,
+        ) as Prisma.InputJsonValue,
+      },
+    });
+  }
+
+  await prisma.auditLog.create({
+    data: { userId, experienceId: experience.id, action: 'EXPERIENCE_CREATED' },
+  });
+  await prisma.auditLog.create({
+    data: {
+      userId,
+      experienceId: experience.id,
+      action: 'TEMPLATE_APPLIED',
+      metadata: { slug: template.slug, mode: 'REPLACE' } as Prisma.InputJsonValue,
+    },
+  });
+
+  return experience;
+}
 
 async function main() {
   console.log('🌱 Seeding database...');
@@ -116,6 +278,37 @@ async function main() {
   });
 
   console.log(`✅ Created user: ${creator.email}`);
+
+  // ─── A custom theme, owned by the creator ────────────────────────────────────
+  // Demonstrates the theme system going beyond the five built-ins: a creator can
+  // start from scratch (or fork a built-in — see ThemeService.fork) and land on
+  // something like this, complete with the newer per-theme fields.
+
+  const customTheme = await prisma.theme.create({
+    data: {
+      name: 'Golden Hour',
+      slug: `golden-hour-${nanoid(6).toLowerCase()}`,
+      description: 'A warm custom look Demo Creator put together for Priya.',
+      isBuiltIn: false,
+      userId: creator.id,
+      primaryColor: '#c2410c',
+      secondaryColor: '#f59e0b',
+      backgroundColor: '#fffaf0',
+      surfaceColor: '#fff4e0',
+      textColor: '#241206',
+      mutedColor: '#8a6a4d',
+      borderColor: '#f0dcc0',
+      fontFamily: "'Outfit', 'system-ui', sans-serif",
+      headingFontFamily: "'Lora', 'Georgia', serif",
+      baseFontSize: '17px',
+      borderRadius: '1rem',
+      backgroundGradient: 'linear-gradient(180deg, #fffaf0 0%, #ffe9c7 100%)',
+      animationLevel: 'NORMAL',
+      transitionStyle: 'FADE',
+    },
+  });
+
+  console.log(`✅ Created custom theme: ${customTheme.name}`);
 
   // ─── Sample Experience: Alex's Birthday ──────────────────────────────────────
 
@@ -313,6 +506,30 @@ async function main() {
     },
   });
 
+  // Customization: a few microcopy overrides and a couple of features turned
+  // off, exercising the same sparse-override shape the API's ConfigService
+  // stores (see apps/api/src/services/config.helpers.ts — everything not
+  // named here still falls back to DEFAULT_COPY / DEFAULT_FEATURES).
+  await prisma.experienceConfig.create({
+    data: {
+      experienceId: experience.id,
+      navigationMode: 'SCROLL',
+      showProgressBar: true,
+      enableConfetti: true,
+      musicAutoplay: false,
+      musicVolume: 45,
+      copy: mergeCopyOverrides(undefined, {
+        'welcome.greeting': 'Hey {recipient}, happy birthday.',
+        'closing.title': "That's everything — for now.",
+      }) as Prisma.InputJsonValue,
+      features: mergeFeatureOverrides(undefined, {
+        // No music was uploaded for this one, so the player stays hidden
+        // rather than showing up with nothing to play.
+        music: false,
+      }) as Prisma.InputJsonValue,
+    },
+  });
+
   // Audit log
   await prisma.auditLog.create({
     data: {
@@ -332,6 +549,19 @@ async function main() {
 
   console.log(`✅ Created sample experience: "${experience.title}" for ${experience.recipientName}`);
   console.log(`🔗 Public token: ${experience.publicToken}`);
+
+  // ─── Sample Experience: built from a template, still a draft ────────────────
+  // Shows the "start from a template" path end to end — the same JSON in
+  // packages/templates that /api/templates serves, stamped onto a real
+  // experience via the same pure helpers the API applies it with.
+
+  const templateExperience = await seedTemplateExperience(creator.id);
+  if (templateExperience) {
+    console.log(
+      `✅ Created draft from template "anniversary-timeline": "${templateExperience.title}" for ${templateExperience.recipientName}`,
+    );
+  }
+
   console.log(`👤 Login: creator@example.com / Password123!`);
   console.log('🌱 Seed complete!');
 }

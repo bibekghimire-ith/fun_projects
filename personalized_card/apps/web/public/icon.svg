@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="A Letter From Me To You">
+  <rect width="128" height="128" rx="24" fill="#16161a" />
+  <path d="M20 40a8 8 0 0 1 8-8h72a8 8 0 0 1 8 8v48a8 8 0 0 1-8 8H28a8 8 0 0 1-8-8V40Z" fill="#fbfbfa" />
+  <path d="M22 38 64 70l42-32" fill="none" stroke="#16161a" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M64 78c-8-8-20-10-20-20a10 10 0 0 1 20-4 10 10 0 0 1 20 4c0 10-12 12-20 20Z" fill="#b42318" />
+</svg>

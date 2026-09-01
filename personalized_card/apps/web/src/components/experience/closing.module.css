@@ -1,0 +1,101 @@
+.closing {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 70vh;
+  padding: 3rem 0;
+  text-align: center;
+  overflow: hidden;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  max-width: 34rem;
+  position: relative;
+  z-index: 1;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: clamp(1.5rem, 6.5vw, 2.1rem);
+  line-height: 1.25;
+  font-weight: 500;
+  text-wrap: balance;
+}
+
+.message {
+  text-align: center;
+  max-width: 34ch;
+  color: var(--color-muted);
+}
+
+.replay {
+  margin-top: 1rem;
+  min-height: 44px;
+  padding: 0.7rem 1.8rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--color-text);
+  font-family: var(--font-heading);
+  font-size: 0.98rem;
+  cursor: pointer;
+  transition: border-color var(--duration) ease;
+}
+
+.replay:hover {
+  border-color: var(--color-primary);
+}
+
+/* ── Confetti ───────────────────────────────────────────────────────────── */
+
+.confetti {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.piece {
+  position: absolute;
+  top: -8%;
+  left: var(--left, 50%);
+  width: var(--size, 6px);
+  height: calc(var(--size, 6px) * 1.6);
+  border-radius: 1px;
+  background: var(--color-primary);
+  opacity: 0;
+  animation: fall var(--fall, 5s) linear var(--delay, 0s) infinite;
+}
+
+.piece:nth-child(3n) {
+  background: var(--color-secondary);
+}
+
+.piece:nth-child(4n) {
+  background: var(--color-muted);
+}
+
+@keyframes fall {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  12% {
+    opacity: 0.75;
+  }
+  85% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--drift, 0px), 115vh, 0) rotate(420deg);
+  }
+}

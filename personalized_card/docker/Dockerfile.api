@@ -7,16 +7,18 @@ RUN npm install -g pnpm@9
 COPY pnpm-workspace.yaml package.json pnpm-lock.yaml* tsconfig.base.json ./
 COPY packages/types/package.json ./packages/types/
 COPY packages/validation/package.json ./packages/validation/
+COPY packages/templates/package.json ./packages/templates/
 COPY apps/api/package.json ./apps/api/
 COPY prisma/ ./prisma/
 
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --no-frozen-lockfile
 
 COPY packages/ ./packages/
 COPY apps/api/ ./apps/api/
 
 RUN pnpm --filter types build
 RUN pnpm --filter validation build
+RUN pnpm --filter templates build
 RUN pnpm --filter api db:generate
 RUN pnpm --filter api build
 
@@ -33,6 +35,11 @@ COPY --from=builder /app/packages ./packages
 COPY --from=builder /app/apps/api/package.json ./apps/api/
 COPY --from=builder /app/apps/api/node_modules ./apps/api/node_modules
 COPY --from=builder /app/apps/api/dist ./apps/api/dist
+# prisma/seed.ts imports these two pure helper modules directly from source
+# (see the comment in seed.ts) rather than duplicating their logic, so tsx
+# needs the .ts files themselves at runtime, not just the compiled dist/.
+COPY --from=builder /app/apps/api/src/services/template.helpers.ts ./apps/api/src/services/template.helpers.ts
+COPY --from=builder /app/apps/api/src/services/config.helpers.ts ./apps/api/src/services/config.helpers.ts
 COPY --from=builder /app/prisma ./prisma
 COPY docker/api-entrypoint.sh /api-entrypoint.sh
 RUN chmod +x /api-entrypoint.sh

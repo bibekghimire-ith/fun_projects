@@ -1,0 +1,62 @@
+[
+  {
+    "slug": "timeline-section",
+    "name": "Timeline section",
+    "description": "Every memory on the experience, laid out in order.",
+    "emoji": "🕰️",
+    "category": "Moments",
+    "blocks": [
+      { "type": "HEADING", "content": { "text": "How we got here", "level": 2, "align": "left" } },
+      { "type": "TIMELINE", "content": { "title": "How we got here", "layout": "alternating" } }
+    ]
+  },
+  {
+    "slug": "countdown-to-date",
+    "name": "Countdown to a date",
+    "description": "Ticking down to a date that matters.",
+    "emoji": "⏳",
+    "category": "Moments",
+    "blocks": [
+      {
+        "type": "COUNTDOWN",
+        "content": {
+          "targetDate": "2027-06-01T00:00:00Z",
+          "label": "Until then",
+          "completedText": "It's today."
+        }
+      }
+    ]
+  },
+  {
+    "slug": "day-we-met",
+    "name": "The day we met",
+    "description": "A short passage about the day it started, paired with the earliest photo you've got.",
+    "emoji": "☀️",
+    "category": "Moments",
+    "blocks": [
+      { "type": "HEADING", "content": { "eyebrow": "Where it started", "text": "The day we met", "level": 3, "align": "center" } },
+      {
+        "type": "TEXT",
+        "content": {
+          "text": "Write what actually happened — where you were, what was said, the detail you still remember without trying.",
+          "align": "left"
+        }
+      },
+      { "type": "IMAGE", "content": { "caption": "The earliest photo you can find", "alt": "An early photo", "rounded": true } }
+    ]
+  },
+  {
+    "slug": "anniversary-marker",
+    "name": "Anniversary marker",
+    "description": "A small marker for a date worth naming — a year, or several, on.",
+    "emoji": "📍",
+    "category": "Moments",
+    "blocks": [
+      { "type": "HEADING", "content": { "eyebrow": "One year on", "text": "A year of this", "level": 3, "align": "center" } },
+      {
+        "type": "TEXT",
+        "content": { "text": "Name what's changed since, and what hasn't. Both are worth saying.", "align": "center" }
+      }
+    ]
+  }
+]

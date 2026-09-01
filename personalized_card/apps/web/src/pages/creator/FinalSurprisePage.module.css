@@ -1,0 +1,33 @@
+.options {
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  margin: 0;
+  display: grid;
+  gap: var(--space-3);
+  justify-items: start;
+}
+
+.optionsTitle {
+  font-size: 0.85rem;
+  font-weight: 550;
+  padding: 0 var(--space-2);
+}
+
+.optionError {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--color-danger);
+}
+
+.optionRow {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-2);
+  width: 100%;
+}
+
+.optionRow > :first-child {
+  flex: 1;
+  min-width: 0;
+}

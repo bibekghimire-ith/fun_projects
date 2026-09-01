@@ -4,10 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "concurrently \"pnpm --filter api dev\" \"pnpm --filter web dev\"",
-    "build": "pnpm --filter types build && pnpm --filter validation build && pnpm --filter api build && pnpm --filter web build",
+    "build": "pnpm --filter types build && pnpm --filter validation build && pnpm --filter templates build && pnpm --filter api build && pnpm --filter web build",
     "lint": "eslint . --ext .ts,.tsx --ignore-pattern '**/node_modules/**' --ignore-pattern '**/dist/**'",
     "typecheck": "pnpm --recursive typecheck",
-    "test": "pnpm --filter api test",
+    "test": "pnpm --filter api test && pnpm --filter web test",
     "test:e2e": "pnpm --filter tests-e2e test",
     "format": "prettier --write .",
     "db:migrate": "pnpm --filter api db:migrate",
@@ -22,6 +22,10 @@
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^9.1.0",
     "prettier": "^3.3.3",
+    "prisma": "5.22.0",
     "typescript": "^5.4.0"
+  },
+  "dependencies": {
+    "@prisma/client": "5.22.0"
   }
 }

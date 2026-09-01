@@ -4,7 +4,7 @@ import { prisma } from '../config/prisma';
 import { experienceService } from '../services/experience.service';
 import { CreateOpenWhenSchema, UpdateOpenWhenSchema } from '@letter/validation';
 
-export const openWhenRouter = Router();
+export const openWhenRouter: Router = Router();
 openWhenRouter.use(authenticate);
 
 openWhenRouter.get('/experiences/:id/open-when', async (req: Request, res: Response, next: NextFunction) => {

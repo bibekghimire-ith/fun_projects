@@ -1,0 +1,90 @@
+.themeGrid {
+  margin-top: var(--space-3);
+}
+
+.themeCard {
+  display: grid;
+  gap: var(--space-3);
+  height: 100%;
+  align-content: start;
+}
+
+.themeCardCurrent {
+  border-color: var(--color-ink);
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
+}
+
+/* Inside the swatch every value comes from the theme's own custom properties. */
+
+.swatch {
+  border-radius: var(--radius);
+  border: 1px solid var(--color-border);
+  background: var(--color-background);
+  padding: var(--space-4);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-height: 5rem;
+}
+
+.swatchHeading {
+  font-family: var(--font-heading);
+  font-size: 1.6rem;
+  color: var(--color-text);
+  line-height: 1;
+}
+
+.swatchDots {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.swatchPrimary,
+.swatchSecondary,
+.swatchSurface {
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+}
+
+.swatchPrimary {
+  background: var(--color-primary);
+}
+
+.swatchSecondary {
+  background: var(--color-secondary);
+}
+
+.swatchSurface {
+  background: var(--color-surface);
+}
+
+/* Back out of the theme's variables for the card's own chrome. */
+
+.themeText {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.themeName {
+  font-family: var(--font-display);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.currentFlag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-success);
+}

@@ -1,5 +1,5 @@
 import { prisma } from '../config/prisma';
-import { AuditAction } from '@prisma/client';
+import { AuditAction, Prisma } from '@prisma/client';
 
 export class AuditService {
   async log(
@@ -13,7 +13,7 @@ export class AuditService {
         userId: userId ?? undefined,
         experienceId: experienceId ?? undefined,
         action,
-        metadata: metadata ?? undefined,
+        metadata: (metadata as Prisma.InputJsonValue) ?? undefined,
       },
     });
   }

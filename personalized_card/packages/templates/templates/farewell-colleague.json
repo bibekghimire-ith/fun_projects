@@ -1,0 +1,163 @@
+{
+  "slug": "farewell-colleague",
+  "name": "The leaving letter",
+  "description": "A send-off from a whole team: a gallery, a timeline of the years, and room for everyone to say the thing they never said.",
+  "tagline": "For someone the office will miss",
+  "eventType": "CUSTOM",
+  "themeSlug": "minimal",
+  "emoji": "👋",
+  "tags": ["farewell", "work", "team", "gallery"],
+  "estimatedMinutes": 35,
+  "defaults": {
+    "title": "Before you go",
+    "openingMessage": "We couldn't fit this on a card, so we didn't try.",
+    "closingMessage": "Go and be brilliant somewhere else. Reluctantly, we approve."
+  },
+  "config": {
+    "navigationMode": "SCROLL",
+    "enableConfetti": true,
+    "copy": {
+      "envelope.title": "Before you go.",
+      "envelope.subtitle": "From all of us.",
+      "welcome.greeting": "{recipient} —",
+      "welcome.subtitle": "We had things to say. Here they are.",
+      "gallery.title": "The evidence",
+      "timeline.title": "The years, briefly",
+      "closing.title": "Go and be brilliant somewhere else.",
+      "surprise.intro": "One last thing from the team."
+    },
+    "features": {
+      "futureLetter": false,
+      "music": false
+    }
+  },
+  "sections": [
+    {
+      "title": "Before you go",
+      "blocks": [
+        {
+          "type": "HEADING",
+          "content": { "text": "Before you go", "level": 1, "align": "center" }
+        },
+        {
+          "type": "TEXT",
+          "content": {
+            "text": "Write the group's version here — why the place will be different without them. Keep it warm and keep it short; the individual notes below do the heavy lifting.",
+            "align": "left"
+          }
+        },
+        { "type": "DIVIDER", "content": { "style": "line" } }
+      ]
+    },
+    {
+      "title": "From the team",
+      "blocks": [
+        {
+          "type": "HEADING",
+          "content": { "eyebrow": "From the team", "text": "What everyone wanted to say", "level": 2 }
+        },
+        {
+          "type": "TEXT",
+          "content": {
+            "text": "Paste each person's note here, with their name underneath. One paragraph each is plenty — ask for a specific memory rather than a compliment.",
+            "align": "left"
+          }
+        },
+        {
+          "type": "QUOTE",
+          "content": {
+            "text": "Replace this with the line they were famous for saying in stand-up.",
+            "attribution": "Every Monday, for years"
+          }
+        }
+      ]
+    },
+    {
+      "title": "The evidence",
+      "blocks": [
+        {
+          "type": "HEADING",
+          "content": { "eyebrow": "The evidence", "text": "Photos we probably shouldn't publish", "level": 2 }
+        },
+        {
+          "type": "GALLERY",
+          "content": { "mediaIds": [], "layout": "grid", "caption": "Away days, launches, and at least one bad hat." }
+        }
+      ]
+    },
+    {
+      "title": "The years, briefly",
+      "blocks": [
+        {
+          "type": "HEADING",
+          "content": { "eyebrow": "The years, briefly", "text": "How it went", "level": 2 }
+        },
+        { "type": "TIMELINE", "content": { "layout": "vertical" } }
+      ]
+    },
+    {
+      "title": "For later",
+      "blocks": [
+        { "type": "HEADING", "content": { "eyebrow": "Before you clear your desk", "text": "For when you need one of these", "level": 2 } },
+        {
+          "type": "TEXT",
+          "content": {
+            "text": "A couple of sealed notes — a reference they can point to, a reminder for the new job's harder days.",
+            "align": "left"
+          }
+        },
+        { "type": "OPEN_WHEN", "content": { "title": "Open when…" } }
+      ]
+    },
+    {
+      "title": "Off you go",
+      "blocks": [
+        {
+          "type": "TEXT",
+          "content": {
+            "text": "Keep in touch properly, not in the way people say they will.",
+            "align": "center"
+          }
+        },
+        {
+          "type": "BUTTON",
+          "content": { "text": "Sign the leaving card", "url": "https://example.com", "style": "primary" }
+        },
+        { "type": "FINAL_QUESTION", "content": { "showIntro": true } }
+      ]
+    }
+  ],
+  "memories": [
+    {
+      "title": "First day",
+      "description": "What they were like before they knew where the good coffee was.",
+      "daysAgo": 1825
+    },
+    {
+      "title": "The project that nearly killed us",
+      "description": "The late nights, and the bit where they saved it.",
+      "daysAgo": 1100
+    },
+    {
+      "title": "The promotion",
+      "description": "Overdue by about a year, as usual.",
+      "daysAgo": 600
+    },
+    {
+      "title": "Last week",
+      "description": "The handover, and the fact that nobody wanted to do it.",
+      "daysAgo": 7
+    }
+  ],
+  "openWhen": [
+    { "label": "you need a reference", "emoji": "📎", "content": "Write the honest, specific version of what you'd tell any future employer about them." },
+    { "label": "the new job feels overwhelming", "emoji": "💪", "content": "Remind them of a specific time they figured out something hard here." },
+    { "label": "you want to talk about the old days", "emoji": "☕", "content": "An open invitation to get coffee and catch up, any time." }
+  ],
+  "finalSurprise": {
+    "question": "Want to leave us something back, before you go?",
+    "buttonText": "Write back",
+    "successMessage": "Got it. We'll read it properly, not just skim it.",
+    "responseType": "TEXT_INPUT"
+  }
+}

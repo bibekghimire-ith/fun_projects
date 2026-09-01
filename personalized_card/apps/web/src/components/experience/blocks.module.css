@@ -1,0 +1,175 @@
+.block {
+  margin: 0 auto 2rem;
+  width: 100%;
+  max-width: 36rem;
+}
+
+.block:last-child {
+  margin-bottom: 0;
+}
+
+/* Timelines and grids want the whole column. */
+.wide {
+  max-width: 46rem;
+}
+
+.center { text-align: center; }
+.right { text-align: right; }
+
+.eyebrow {
+  margin: 0 0 0.4rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.heading {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  line-height: 1.25;
+  font-weight: 500;
+  text-wrap: balance;
+}
+
+.headingLarge {
+  font-size: clamp(1.75rem, 6.5vw, 2.25rem);
+}
+
+.quoteFigure {
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+.quote {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 1.3rem;
+  line-height: 1.5;
+  font-style: italic;
+  text-wrap: balance;
+}
+
+.attribution {
+  margin: 0.75rem 0 0;
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  color: var(--color-muted);
+}
+
+.figure {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.image {
+  width: 100%;
+  object-fit: cover;
+}
+
+.contain {
+  object-fit: contain;
+}
+
+.rounded {
+  border-radius: var(--radius);
+}
+
+.video {
+  width: 100%;
+  display: block;
+  background: var(--color-surface);
+}
+
+.caption {
+  margin: 0.6rem 0 0;
+  font-size: 0.85rem;
+  color: var(--color-muted);
+  text-align: center;
+}
+
+.countdownLabel {
+  margin: 0 0 0.6rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.countdownUnits {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.4rem 1.25rem;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-heading);
+  font-size: 1.45rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.countdownDone {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 1.3rem;
+  line-height: 1.4;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0.75rem 1.9rem;
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius);
+  background: var(--color-primary);
+  color: var(--color-surface);
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  text-decoration: none;
+}
+
+.secondary {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border-color: var(--color-border);
+}
+
+.ghost {
+  background: transparent;
+  color: var(--color-text);
+  border-color: transparent;
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+}
+
+.divider {
+  border: 0;
+  height: 1px;
+  width: min(100%, 36rem);
+  background: var(--color-border);
+  margin: 2.5rem auto;
+}
+
+.gap {
+  height: 3.5rem;
+}
+
+.dots {
+  display: inline-flex;
+  gap: 0.6rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.dots span {
+  display: block;
+  width: 4px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--color-muted);
+}

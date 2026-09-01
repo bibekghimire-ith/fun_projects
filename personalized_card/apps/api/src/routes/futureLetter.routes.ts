@@ -4,7 +4,7 @@ import { prisma } from '../config/prisma';
 import { experienceService } from '../services/experience.service';
 import { FutureLetterSchema } from '@letter/validation';
 
-export const futureLetterRouter = Router();
+export const futureLetterRouter: Router = Router();
 futureLetterRouter.use(authenticate);
 
 futureLetterRouter.get('/experiences/:id/future-letter', async (req: Request, res: Response, next: NextFunction) => {

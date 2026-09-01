@@ -1,0 +1,53 @@
+.filterBar {
+  max-width: 14rem;
+}
+
+.grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+}
+
+.tile {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  height: 100%;
+  align-content: start;
+}
+
+.tileName {
+  font-size: 0.85rem;
+  font-weight: 550;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-top: var(--space-2);
+}
+
+.tileMeta {
+  font-size: 0.75rem;
+  color: var(--color-muted);
+}
+
+.tileActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  margin-top: var(--space-2);
+}
+
+.usedFlag {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  border: 1px solid var(--color-line);
+  border-radius: 99px;
+  padding: 0.1rem 0.4rem;
+}

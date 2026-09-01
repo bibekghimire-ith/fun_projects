@@ -1,0 +1,148 @@
+{
+  "slug": "birthday-classic",
+  "name": "The birthday letter",
+  "description": "A warm, five-chapter birthday letter: a welcome, the year behind you, a photo wall, a timeline of moments, sealed notes for later, and a surprise at the end.",
+  "tagline": "Everything you'd want to say on their birthday",
+  "eventType": "BIRTHDAY",
+  "themeSlug": "sunset",
+  "emoji": "🎂",
+  "tags": ["birthday", "warm", "photos", "complete"],
+  "estimatedMinutes": 45,
+  "defaults": {
+    "title": "Happy birthday",
+    "openingMessage": "Before you scroll — this took a while to make, and every bit of it is true.",
+    "closingMessage": "Here's to another year of you. I'm glad I get to watch it happen."
+  },
+  "config": {
+    "navigationMode": "SCROLL",
+    "enableConfetti": true,
+    "copy": {
+      "envelope.title": "It's your birthday.",
+      "envelope.subtitle": "And I didn't want to just send a text.",
+      "envelope.button": "Open it",
+      "welcome.greeting": "Happy birthday, {recipient}.",
+      "welcome.subtitle": "Take your time with this one.",
+      "closing.title": "Here's to another year of you.",
+      "surprise.intro": "One last thing, and then I'll let you go."
+    }
+  },
+  "sections": [
+    {
+      "title": "Welcome",
+      "blocks": [
+        {
+          "type": "HEADING",
+          "content": {
+            "eyebrow": "Chapter one",
+            "text": "Happy birthday",
+            "level": 1,
+            "align": "center"
+          }
+        },
+        {
+          "type": "TEXT",
+          "content": {
+            "text": "I could have sent a message this morning like everyone else. But there are things that don't fit in a message, and this year I wanted to say them properly.\n\nSo: happy birthday. Scroll slowly.",
+            "align": "left"
+          }
+        },
+        { "type": "DIVIDER", "content": { "style": "dots" } }
+      ]
+    },
+    {
+      "title": "The year behind you",
+      "blocks": [
+        {
+          "type": "HEADING",
+          "content": { "eyebrow": "Chapter two", "text": "The year you just had", "level": 2 }
+        },
+        {
+          "type": "TEXT",
+          "content": {
+            "text": "Write about their year here — the thing they were nervous about and did anyway, the thing that didn't work out, the way they handled it. Be specific. Specific is what makes it land.",
+            "align": "left"
+          }
+        },
+        {
+          "type": "QUOTE",
+          "content": {
+            "text": "Replace this with something they actually said this year that you never forgot.",
+            "attribution": "You, probably without noticing"
+          }
+        },
+        {
+          "type": "IMAGE",
+          "content": { "caption": "A photo from this year", "alt": "A photo from this year", "rounded": true }
+        }
+      ]
+    },
+    {
+      "title": "Us, in pictures",
+      "blocks": [
+        {
+          "type": "HEADING",
+          "content": { "eyebrow": "Chapter three", "text": "Some memories deserve another look", "level": 2 }
+        },
+        {
+          "type": "GALLERY",
+          "content": { "mediaIds": [], "layout": "grid", "caption": "Tap any photo to see it properly." }
+        }
+      ]
+    },
+    {
+      "title": "How we got here",
+      "blocks": [
+        {
+          "type": "HEADING",
+          "content": { "eyebrow": "Chapter four", "text": "How we got here", "level": 2 }
+        },
+        { "type": "TIMELINE", "content": { "layout": "alternating" } }
+      ]
+    },
+    {
+      "title": "For later",
+      "blocks": [
+        {
+          "type": "HEADING",
+          "content": { "eyebrow": "Chapter five", "text": "For the days that need it", "level": 2 }
+        },
+        {
+          "type": "TEXT",
+          "content": {
+            "text": "These are sealed. Open one when the label fits — not before.",
+            "align": "center"
+          }
+        },
+        { "type": "OPEN_WHEN", "content": { "title": "Open when…" } },
+        { "type": "FUTURE_LETTER", "content": { "showCountdown": true } }
+      ]
+    },
+    {
+      "title": "One more thing",
+      "blocks": [{ "type": "FINAL_QUESTION", "content": { "showIntro": true } }]
+    }
+  ],
+  "memories": [
+    { "title": "The day we met", "description": "Replace this with what actually happened. The small details are the ones worth keeping.", "daysAgo": 1460 },
+    { "title": "That trip", "description": "Where you went, what went wrong, why it's still the story you tell.", "location": "Somewhere worth remembering", "daysAgo": 900 },
+    { "title": "The hard year", "description": "The one you got through. Worth naming — it's part of the story too.", "daysAgo": 400 },
+    { "title": "Last birthday", "description": "What you did, and what's changed since.", "daysAgo": 365 }
+  ],
+  "openWhen": [
+    { "label": "you need to hear something good", "emoji": "☀️", "content": "Replace this with the thing you'd say if they called you at 2am feeling small. Say it plainly." },
+    { "label": "you can't sleep", "emoji": "🌙", "content": "Something quiet. A memory that doesn't ask anything of them." },
+    { "label": "you're proud of yourself", "emoji": "🎉", "content": "Tell them you saw it too. People rarely get told this one." },
+    { "label": "you miss me", "emoji": "💌", "content": "The one to write last, when you know what you actually want to say.", "isOneTime": true }
+  ],
+  "futureLetter": {
+    "title": "Read this on your next birthday",
+    "content": "Write this one to the person they'll be in a year. Guess at what they'll have been through. Being wrong is fine — being there is the point.",
+    "unlockInDays": 365
+  },
+  "finalSurprise": {
+    "question": "Same time next year?",
+    "buttonText": "Open the last one",
+    "successMessage": "Good. I'll start making the next one.",
+    "responseType": "YES_NO"
+  }
+}

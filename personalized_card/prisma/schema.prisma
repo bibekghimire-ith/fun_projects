@@ -66,6 +66,18 @@ enum AnimationLevel {
   RICH
 }
 
+enum NavigationMode {
+  SCROLL
+  CHAPTERS
+}
+
+enum TransitionStyle {
+  FADE
+  SLIDE
+  ZOOM
+  NONE
+}
+
 enum AuditAction {
   EXPERIENCE_CREATED
   EXPERIENCE_UPDATED
@@ -77,6 +89,13 @@ enum AuditAction {
   PIN_ENABLED
   PIN_DISABLED
   RESPONSE_RECEIVED
+  TEMPLATE_APPLIED
+  THEME_CREATED
+  THEME_UPDATED
+  THEME_DELETED
+  CONFIG_UPDATED
+  SECTION_CREATED
+  SECTION_DELETED
 }
 
 // ─── Models ───────────────────────────────────────────────────────────────────
@@ -90,6 +109,7 @@ model User {
   updatedAt    DateTime     @updatedAt
   experiences  Experience[]
   auditLogs    AuditLog[]
+  themes       Theme[]
 
   @@map("users")
 }
@@ -112,6 +132,7 @@ model Experience {
   theme           Theme?              @relation(fields: [themeId], references: [id])
   coverMediaId    String?
   musicMediaId    String?
+  templateSlug    String?
   createdAt       DateTime            @default(now())
   updatedAt       DateTime            @updatedAt
   sections        ExperienceSection[]
@@ -123,6 +144,7 @@ model Experience {
   responses       Response[]
   accessLogs      ExperienceAccess[]
   auditLogs       AuditLog[]
+  config          ExperienceConfig?
 
   @@index([userId])
   @@index([publicToken])
@@ -232,7 +254,7 @@ model FutureLetter {
   title        String
   content      String
   unlockDate   DateTime
-  mediaId      String?
+  mediaId      String?    @unique
   media        Media?     @relation("FutureLetterMedia", fields: [mediaId], references: [id])
   unlockedAt   DateTime?
   createdAt    DateTime   @default(now())
@@ -251,7 +273,7 @@ model FinalSurprise {
   successMessage String
   responseType   ResponseType @default(YES_NO)
   options        Json?
-  mediaId        String?
+  mediaId        String?      @unique
   media          Media?       @relation("FinalSurpriseMedia", fields: [mediaId], references: [id])
   ctaText        String?
   ctaUrl         String?
@@ -262,21 +284,57 @@ model FinalSurprise {
 }
 
 model Theme {
-  id              String         @id @default(uuid())
-  name            String
-  slug            String         @unique
-  isBuiltIn       Boolean        @default(false)
-  primaryColor    String
-  secondaryColor  String
-  backgroundColor String
-  surfaceColor    String
-  textColor       String
-  fontFamily      String         @default("'Inter', sans-serif")
-  borderRadius    String         @default("0.75rem")
-  animationLevel  AnimationLevel @default(NORMAL)
-  experiences     Experience[]
+  id                 String         @id @default(uuid())
+  name               String
+  slug               String         @unique
+  description        String?
+  isBuiltIn          Boolean        @default(false)
+  userId             String?
+  user               User?          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  primaryColor       String
+  secondaryColor     String
+  backgroundColor    String
+  surfaceColor       String
+  textColor          String
+  mutedColor         String         @default("#6b7280")
+  borderColor        String         @default("#e5e7eb")
+  fontFamily         String         @default("'Inter', system-ui, sans-serif")
+  headingFontFamily  String         @default("'Lora', Georgia, serif")
+  baseFontSize       String         @default("16px")
+  borderRadius       String         @default("0.75rem")
+  backgroundGradient String?
+  animationLevel     AnimationLevel @default(NORMAL)
+  transitionStyle    TransitionStyle @default(FADE)
+  customCss          String?
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+  experiences        Experience[]
 
+  @@index([userId])
   @@map("themes")
+}
+
+/// Per-experience customization: recipient-facing microcopy, feature toggles
+/// and playback/layout settings. Created lazily with sensible defaults.
+model ExperienceConfig {
+  id              String          @id @default(uuid())
+  experienceId    String          @unique
+  experience      Experience      @relation(fields: [experienceId], references: [id], onDelete: Cascade)
+  navigationMode  NavigationMode  @default(SCROLL)
+  showProgressBar Boolean         @default(true)
+  enableConfetti  Boolean         @default(true)
+  musicAutoplay   Boolean         @default(true)
+  musicVolume     Int             @default(60)
+  locale          String          @default("en")
+  dateFormat      String          @default("MMMM d, yyyy")
+  /// Microcopy overrides, keyed by copy key (see packages/types COPY_KEYS).
+  copy            Json            @default("{}")
+  /// Feature toggles, keyed by feature key (see packages/types FEATURE_KEYS).
+  features        Json            @default("{}")
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@map("experience_configs")
 }
 
 model Response {

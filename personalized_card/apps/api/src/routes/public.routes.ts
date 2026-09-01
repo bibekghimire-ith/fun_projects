@@ -4,7 +4,7 @@ import { publicService } from '../services/public.service';
 import { VerifyPinSchema, SubmitResponseSchema } from '@letter/validation';
 import { config } from '../config/env';
 
-export const publicRouter = Router();
+export const publicRouter: Router = Router();
 
 const publicLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -15,7 +15,7 @@ const publicLimiter = rateLimit({
 
 const pinLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 5,
+  max: config.PIN_VERIFY_RATE_LIMIT_MAX,
   message: {
     success: false,
     error: { code: 'RATE_LIMITED', message: 'Too many PIN attempts. Try again later.' },
@@ -49,7 +49,7 @@ publicRouter.get('/e/:token', async (req: Request, res: Response, next: NextFunc
 publicRouter.post('/e/:token/verify', pinLimiter, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { pin } = VerifyPinSchema.parse(req.body);
-    const result = await publicService.verifyPin(req.params.token, pin);
+    const result = await publicService.verifyPin(req.params.token, pin, req.ip);
     res.cookie('pinToken', result.pinToken, {
       httpOnly: true,
       secure: config.NODE_ENV === 'production',

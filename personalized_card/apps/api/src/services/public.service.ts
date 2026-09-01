@@ -6,8 +6,33 @@ import { AppError } from '../middleware/errorHandler';
 import { config } from '../config/env';
 import { isFutureLetterUnlocked, isOpenWhenUnlocked } from '../utils/unlock';
 import { mediaService } from './media.service';
+import { toResolvedConfig } from './config.helpers';
+import { AttemptLimiter } from '../utils/rateLimiter';
+
+/**
+ * Per-experience, per-visitor PIN lockout.
+ *
+ * This lives in process memory, so it protects a single API instance only —
+ * see the note in utils/rateLimiter.ts. Behind more than one instance it should
+ * be swapped for the Redis-backed equivalent.
+ */
+const pinLimiter = new AttemptLimiter({
+  maxAttempts: config.PIN_MAX_ATTEMPTS,
+  lockoutMs: config.PIN_LOCKOUT_MINUTES * 60 * 1000,
+});
 
 export class PublicService {
+  /** Visitors are identified by a salted hash, never by a raw IP. */
+  private ipHash(ipAddress?: string): string {
+    return createHash('sha256')
+      .update((ipAddress ?? 'unknown') + config.COOKIE_SECRET)
+      .digest('hex');
+  }
+
+  private pinKey(experienceId: string, ipAddress?: string): string {
+    return `${experienceId}:${this.ipHash(ipAddress)}`;
+  }
+
   signPinToken(experienceId: string) {
     return jwt.sign({ typ: 'pin', experienceId }, config.JWT_SECRET, { expiresIn: '12h' });
   }
@@ -45,6 +70,8 @@ export class PublicService {
         openWhenMessages: { include: { media: true }, orderBy: { order: 'asc' } },
         futureLetter: { include: { media: true } },
         finalSurprise: { include: { media: true } },
+        media: true,
+        config: true,
       },
     });
 
@@ -53,30 +80,43 @@ export class PublicService {
       throw new AppError(403, 'UNAVAILABLE', 'This experience is not available');
     }
 
+    // Defaults are merged in here so the client never has to fall back itself.
+    const resolvedConfig = toResolvedConfig(exp.config);
+
     if (exp.pinEnabled) {
       const ok = this.verifyPinToken(pinToken, exp.id);
       if (!ok) {
+        // The PIN screen still needs the theme and the microcopy to render.
         return {
           pinRequired: true as const,
           title: exp.title,
           recipientName: exp.recipientName,
           theme: exp.theme,
+          config: resolvedConfig,
           publicToken: exp.publicToken,
         };
       }
     }
 
+    const features = resolvedConfig.features;
+
     if (ipAddress) {
-      const ipHash = createHash('sha256')
-        .update(ipAddress + config.COOKIE_SECRET)
-        .digest('hex');
       await prisma.experienceAccess.create({
-        data: { experienceId: exp.id, ipHash, userAgent: userAgent?.slice(0, 500) },
+        data: {
+          experienceId: exp.id,
+          ipHash: this.ipHash(ipAddress),
+          userAgent: userAgent?.slice(0, 500),
+        },
       });
     }
 
     const mapMedia = (m: Parameters<typeof mediaService.withUrls>[0] | null) =>
       m ? mediaService.withUrls(m) : null;
+
+    // Computed once: the answer must not drift between the flag and the body.
+    const futureLetterUnlocked = exp.futureLetter
+      ? isFutureLetterUnlocked(exp.futureLetter.unlockDate)
+      : false;
 
     return {
       pinRequired: false as const,
@@ -88,6 +128,7 @@ export class PublicService {
       openingMessage: exp.openingMessage,
       closingMessage: exp.closingMessage,
       theme: exp.theme,
+      config: resolvedConfig,
       coverMedia: exp.coverMediaId
         ? await prisma.media
             .findUnique({ where: { id: exp.coverMediaId } })
@@ -98,54 +139,93 @@ export class PublicService {
             .findUnique({ where: { id: exp.musicMediaId } })
             .then((m) => (m ? mediaService.withUrls(m) : null))
         : null,
+      // Gallery blocks store bare media ids, so the whole media index travels
+      // with the payload rather than making the client guess a URL shape.
+      media: exp.media.map((m) => mediaService.withUrls(m)),
       sections: exp.sections.map((s) => ({
         ...s,
         blocks: s.blocks.map((b) => ({ ...b, media: mapMedia(b.media) })),
       })),
-      memories: exp.memories.map((m) => ({ ...m, media: mapMedia(m.media) })),
-      openWhenMessages: exp.openWhenMessages.map((msg) => {
-        const unlocked = isOpenWhenUnlocked(msg);
-        return {
-          id: msg.id,
-          label: msg.label,
-          emoji: msg.emoji,
-          unlockType: msg.unlockType,
-          unlockDate: msg.unlockDate,
-          isOneTime: msg.isOneTime,
-          isUnlocked: unlocked,
-          ...(unlocked ? { content: msg.content, media: mapMedia(msg.media) } : {}),
-        };
-      }),
-      futureLetter: exp.futureLetter
-        ? {
-            id: exp.futureLetter.id,
-            title: exp.futureLetter.title,
-            unlockDate: exp.futureLetter.unlockDate,
-            isUnlocked: isFutureLetterUnlocked(exp.futureLetter.unlockDate),
-            ...(isFutureLetterUnlocked(exp.futureLetter.unlockDate)
-              ? {
-                  content: exp.futureLetter.content,
-                  media: mapMedia(exp.futureLetter.media),
-                }
-              : {}),
-          }
-        : null,
-      finalSurprise: exp.finalSurprise
-        ? { ...exp.finalSurprise, media: mapMedia(exp.finalSurprise.media) }
-        : null,
+      // A module the creator switched off is not sent at all, rather than sent
+      // and hidden client-side.
+      memories: features.timeline
+        ? exp.memories.map((m) => ({ ...m, media: mapMedia(m.media) }))
+        : [],
+      openWhenMessages: features.openWhen
+        ? exp.openWhenMessages.map((msg) => {
+            const unlocked = isOpenWhenUnlocked(msg);
+            return {
+              id: msg.id,
+              label: msg.label,
+              emoji: msg.emoji,
+              unlockType: msg.unlockType,
+              unlockDate: msg.unlockDate,
+              isOneTime: msg.isOneTime,
+              isUnlocked: unlocked,
+              ...(unlocked ? { content: msg.content, media: mapMedia(msg.media) } : {}),
+            };
+          })
+        : [],
+      futureLetter:
+        features.futureLetter && exp.futureLetter
+          ? {
+              id: exp.futureLetter.id,
+              title: exp.futureLetter.title,
+              unlockDate: exp.futureLetter.unlockDate,
+              isUnlocked: futureLetterUnlocked,
+              ...(futureLetterUnlocked
+                ? {
+                    content: exp.futureLetter.content,
+                    media: mapMedia(exp.futureLetter.media),
+                  }
+                : {}),
+            }
+          : null,
+      finalSurprise:
+        features.finalSurprise && exp.finalSurprise
+          ? { ...exp.finalSurprise, media: mapMedia(exp.finalSurprise.media) }
+          : null,
     };
   }
 
-  async verifyPin(token: string, pin: string) {
+  async verifyPin(token: string, pin: string, ipAddress?: string) {
     const exp = await prisma.experience.findUnique({ where: { publicToken: token } });
+    // Same 404 for "no such letter" and "not published", so this endpoint never
+    // becomes a way to discover which tokens exist.
     if (!exp || exp.status !== 'PUBLISHED') {
       throw new AppError(404, 'NOT_FOUND', 'Experience not found');
     }
     if (!exp.pinEnabled || !exp.pinHash) {
       return { verified: true, pinToken: this.signPinToken(exp.id) };
     }
+
+    const key = this.pinKey(exp.id, ipAddress);
+
+    const existingLock = pinLimiter.check(key);
+    if (existingLock.locked) {
+      throw new AppError(
+        429,
+        'PIN_LOCKED',
+        'Too many attempts. Come back in a little while.',
+        { retryAfterSeconds: existingLock.retryAfterSeconds },
+      );
+    }
+
     const valid = await argon2.verify(exp.pinHash, pin);
-    if (!valid) throw new AppError(401, 'INVALID_PIN', 'Incorrect PIN');
+    if (!valid) {
+      const lock = pinLimiter.recordFailure(key);
+      if (lock.locked) {
+        throw new AppError(
+          429,
+          'PIN_LOCKED',
+          'Too many attempts. Come back in a little while.',
+          { retryAfterSeconds: lock.retryAfterSeconds },
+        );
+      }
+      throw new AppError(401, 'INVALID_PIN', 'Incorrect PIN');
+    }
+
+    pinLimiter.reset(key);
     return { verified: true, pinToken: this.signPinToken(exp.id) };
   }
 

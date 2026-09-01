@@ -1,0 +1,9 @@
+.page {
+  display: block;
+  /*
+   * `clip`, not `hidden`: hidden would turn this into a scroll container and
+   * quietly break the sticky progress bar and chapter nav inside it. Nothing
+   * but a deliberate carousel may move sideways.
+   */
+  overflow-x: clip;
+}

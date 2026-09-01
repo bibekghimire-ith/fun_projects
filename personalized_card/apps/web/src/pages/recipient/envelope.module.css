@@ -1,0 +1,126 @@
+.page {
+  display: block;
+}
+
+.stage {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  padding: 2.5rem 1.5rem calc(2.5rem + env(safe-area-inset-bottom));
+  text-align: center;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: clamp(1.8rem, 8vw, 2.6rem);
+  line-height: 1.15;
+  font-weight: 500;
+  text-wrap: balance;
+  max-width: 18ch;
+}
+
+.subtitle {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 1rem;
+  max-width: 30ch;
+}
+
+.envelope {
+  position: relative;
+  display: block;
+  width: min(78vw, 19rem);
+  aspect-ratio: 3 / 2;
+  margin: 1.25rem 0 0.5rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.body {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 10px 30px rgb(0 0 0 / 0.08);
+}
+
+/* The flap: a triangle folded down over the top half. */
+.flap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 58%;
+  background: var(--color-primary);
+  opacity: 0.14;
+  border-radius: var(--radius) var(--radius) 0 0;
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  transform-origin: top center;
+  transition: transform var(--duration-slow, 600ms) ease, opacity var(--duration-slow, 600ms) ease;
+}
+
+.flapOpen {
+  transform: rotateX(160deg);
+  opacity: 0.05;
+}
+
+.seal {
+  position: absolute;
+  left: 50%;
+  top: 52%;
+  transform: translate(-50%, -50%);
+  width: 2.75rem;
+  height: 2.75rem;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--color-primary);
+  color: var(--color-surface);
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  letter-spacing: 0.02em;
+}
+
+.hint {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1.9rem;
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}
+
+.openButton {
+  margin-top: 2.25rem;
+  min-height: 44px;
+  padding: 0.8rem 2.4rem;
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius);
+  background: var(--color-primary);
+  color: var(--color-surface);
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  cursor: pointer;
+  transition: opacity var(--duration) ease, transform var(--duration) ease;
+}
+
+.openButton:hover:not(:disabled) {
+  opacity: 0.92;
+}
+
+.openButton:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.openButton:disabled {
+  opacity: 0.5;
+  cursor: default;
+}

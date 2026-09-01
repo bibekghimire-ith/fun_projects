@@ -1,0 +1,57 @@
+[
+  {
+    "slug": "single-photo",
+    "name": "Photo",
+    "description": "One image with a caption underneath.",
+    "emoji": "🖼️",
+    "category": "Media",
+    "blocks": [
+      {
+        "type": "IMAGE",
+        "content": { "caption": "A photo worth keeping", "alt": "A photo", "fit": "cover", "rounded": true }
+      }
+    ]
+  },
+  {
+    "slug": "photo-wall",
+    "name": "Photo wall",
+    "description": "A titled grid gallery with a lightbox.",
+    "emoji": "🎞️",
+    "category": "Media",
+    "blocks": [
+      { "type": "HEADING", "content": { "text": "Us, in pictures", "level": 2, "align": "left" } },
+      {
+        "type": "GALLERY",
+        "content": { "mediaIds": [], "layout": "grid", "caption": "Tap any photo to see it properly." }
+      }
+    ]
+  },
+  {
+    "slug": "voice-letter",
+    "name": "Voice letter",
+    "description": "A full-screen audio moment — say it out loud instead of writing it.",
+    "emoji": "🎙️",
+    "category": "Media",
+    "blocks": [
+      { "type": "HEADING", "content": { "text": "Don't read this one", "level": 2, "align": "center" } },
+      {
+        "type": "AUDIO",
+        "content": {
+          "title": "A voice note",
+          "description": "Record it in one take. The stumbles are the good part.",
+          "isVoiceLetter": true
+        }
+      }
+    ]
+  },
+  {
+    "slug": "video-moment",
+    "name": "Video",
+    "description": "A short clip with a caption.",
+    "emoji": "🎬",
+    "category": "Media",
+    "blocks": [
+      { "type": "VIDEO", "content": { "caption": "A clip worth keeping", "loop": false, "autoplay": false } }
+    ]
+  }
+]

@@ -8,9 +8,12 @@
     "build": "tsc -b && vite build",
     "lint": "eslint src --ext ts,tsx",
     "typecheck": "tsc --noEmit",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
+    "@letter/templates": "workspace:*",
     "@letter/types": "workspace:*",
     "@letter/validation": "workspace:*",
     "@dnd-kit/core": "^6.1.0",
@@ -19,7 +22,7 @@
     "@tanstack/react-query": "^5.35.1",
     "@tiptap/react": "^2.3.1",
     "@tiptap/starter-kit": "^2.3.1",
-    "framer-motion": "^11.2.4",
+    "framer-motion": "11.2.4",
     "lucide-react": "^0.378.0",
     "qrcode.react": "^3.1.0",
     "react": "^18.2.0",
@@ -30,10 +33,12 @@
     "zustand": "^4.5.2"
   },
   "devDependencies": {
-    "@types/react": "^18.2.66",
-    "@types/react-dom": "^18.2.22",
+    "@types/node": "^20.14.0",
+    "@types/react": "18.2.66",
+    "@types/react-dom": "18.2.22",
     "@vitejs/plugin-react": "^4.2.1",
-    "typescript": "^5.2.2",
-    "vite": "^5.2.0"
+    "typescript": "5.3.3",
+    "vite": "^5.2.0",
+    "vitest": "^1.6.0"
   }
 }

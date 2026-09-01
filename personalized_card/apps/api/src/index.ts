@@ -4,11 +4,15 @@ import { config } from './config/env';
 import { logger } from './utils/logger';
 import { prisma } from './config/prisma';
 import { startScheduledJobs } from './jobs/scheduler';
+import { templateService } from './services/template.service';
 
 async function main() {
   // Test DB connection
   await prisma.$connect();
   logger.info('✅ Database connected');
+
+  // Register any templates dropped in TEMPLATES_EXTRA_DIR before serving.
+  templateService.loadExtraTemplates();
 
   const app = createApp();
 

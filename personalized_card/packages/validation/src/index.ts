@@ -179,3 +179,205 @@ export type UpdateOpenWhenInput = z.infer<typeof UpdateOpenWhenSchema>;
 export type FutureLetterInput = z.infer<typeof FutureLetterSchema>;
 export type FinalSurpriseInput = z.infer<typeof FinalSurpriseSchema>;
 export type SubmitResponseInput = z.infer<typeof SubmitResponseSchema>;
+
+// ─── Themes (custom, per-user) ────────────────────────────────────────────────
+
+const HexColor = z
+  .string()
+  .regex(/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/, 'Must be a hex colour like #1a1a1a');
+
+const CssLength = z
+  .string()
+  .max(24)
+  .regex(/^[0-9.]+(px|rem|em|%)$/, 'Must be a CSS length like 0.75rem');
+
+const SafeFontStack = z
+  .string()
+  .min(1)
+  .max(200)
+  .regex(/^[\w\s,'"()\-.]+$/, 'Font stack contains unsupported characters');
+
+export const AnimationLevelSchema = z.enum(['NONE', 'MINIMAL', 'NORMAL', 'RICH']);
+export const TransitionStyleSchema = z.enum(['FADE', 'SLIDE', 'ZOOM', 'NONE']);
+export const NavigationModeSchema = z.enum(['SCROLL', 'CHAPTERS']);
+
+/**
+ * Custom CSS is allowed but deliberately narrow: no @import, no url(), no
+ * expression() and no closing style tags. It is injected into a scoped
+ * <style> element, never into markup.
+ */
+const CustomCss = z
+  .string()
+  .max(8000, 'Custom CSS is limited to 8000 characters')
+  .refine((css) => !/@import|url\s*\(|expression\s*\(|<\/?\s*style|javascript:/i.test(css), {
+    message: 'Custom CSS may not use @import, url(), expression() or <style> tags',
+  });
+
+export const CreateThemeSchema = z.object({
+  name: z.string().min(1, 'Name is required').max(60, 'Name too long'),
+  description: z.string().max(200).optional().nullable(),
+  primaryColor: HexColor,
+  secondaryColor: HexColor,
+  backgroundColor: HexColor,
+  surfaceColor: HexColor,
+  textColor: HexColor,
+  mutedColor: HexColor.default('#6b7280'),
+  borderColor: HexColor.default('#e5e7eb'),
+  fontFamily: SafeFontStack.default("'Inter', system-ui, sans-serif"),
+  headingFontFamily: SafeFontStack.default("'Lora', Georgia, serif"),
+  baseFontSize: CssLength.default('16px'),
+  borderRadius: CssLength.default('0.75rem'),
+  backgroundGradient: z.string().max(300).optional().nullable(),
+  animationLevel: AnimationLevelSchema.default('NORMAL'),
+  transitionStyle: TransitionStyleSchema.default('FADE'),
+  customCss: CustomCss.optional().nullable(),
+});
+
+export const UpdateThemeSchema = CreateThemeSchema.partial();
+
+/** Duplicate a built-in theme as a starting point for a custom one. */
+export const ForkThemeSchema = z.object({
+  themeId: z.string().uuid(),
+  name: z.string().min(1).max(60).optional(),
+});
+
+// ─── Experience configuration (microcopy + toggles) ───────────────────────────
+
+export const ExperienceConfigSchema = z.object({
+  navigationMode: NavigationModeSchema.optional(),
+  showProgressBar: z.boolean().optional(),
+  enableConfetti: z.boolean().optional(),
+  musicAutoplay: z.boolean().optional(),
+  musicVolume: z.number().int().min(0).max(100).optional(),
+  locale: z.string().min(2).max(10).optional(),
+  dateFormat: z.string().min(1).max(40).optional(),
+  /** Sparse map of copy key -> override. Empty string resets to the default. */
+  copy: z.record(z.string().max(600)).optional(),
+  features: z.record(z.boolean()).optional(),
+});
+
+// ─── Templates ────────────────────────────────────────────────────────────────
+
+export const ApplyTemplateSchema = z.object({
+  slug: z.string().min(1).max(60),
+  /** REPLACE wipes existing sections; APPEND keeps them. */
+  mode: z.enum(['REPLACE', 'APPEND']).default('APPEND'),
+  /** Also apply the template's theme, copy and feature toggles. */
+  includeTheme: z.boolean().default(true),
+  includeConfig: z.boolean().default(true),
+  includeExtras: z.boolean().default(true),
+});
+
+export const CreateFromTemplateSchema = CreateExperienceSchema.extend({
+  templateSlug: z.string().min(1).max(60).optional().nullable(),
+});
+
+export const ApplyPresetSchema = z.object({
+  slug: z.string().min(1).max(60),
+});
+
+// ─── Block content, validated per block type ──────────────────────────────────
+
+const AlignSchema = z.enum(['left', 'center', 'right']);
+
+export const BlockContentSchemas = {
+  TEXT: z.object({
+    doc: z.unknown().optional(),
+    text: z.string().max(20000).optional(),
+    align: AlignSchema.optional(),
+  }),
+  HEADING: z.object({
+    text: z.string().min(1).max(200),
+    level: z.union([z.literal(1), z.literal(2), z.literal(3)]).optional(),
+    align: AlignSchema.optional(),
+    eyebrow: z.string().max(100).optional(),
+  }),
+  IMAGE: z.object({
+    caption: z.string().max(500).optional(),
+    alt: z.string().max(300).optional(),
+    fit: z.enum(['cover', 'contain']).optional(),
+    rounded: z.boolean().optional(),
+  }),
+  GALLERY: z.object({
+    mediaIds: z.array(z.string().uuid()).max(60).default([]),
+    layout: z.enum(['grid', 'masonry', 'carousel']).optional(),
+    caption: z.string().max(500).optional(),
+  }),
+  VIDEO: z.object({
+    caption: z.string().max(500).optional(),
+    autoplay: z.boolean().optional(),
+    loop: z.boolean().optional(),
+  }),
+  AUDIO: z.object({
+    title: z.string().max(200).optional(),
+    description: z.string().max(500).optional(),
+    isVoiceLetter: z.boolean().optional(),
+  }),
+  TIMELINE: z.object({
+    title: z.string().max(200).optional(),
+    memoryIds: z.array(z.string().uuid()).max(200).optional(),
+    layout: z.enum(['vertical', 'alternating']).optional(),
+  }),
+  QUOTE: z.object({
+    text: z.string().min(1).max(1000),
+    attribution: z.string().max(200).optional(),
+  }),
+  DIVIDER: z.object({
+    style: z.enum(['line', 'dots', 'hearts', 'space']).optional(),
+  }),
+  COUNTDOWN: z.object({
+    targetDate: z.string().datetime(),
+    label: z.string().max(200).optional(),
+    completedText: z.string().max(200).optional(),
+  }),
+  OPEN_WHEN: z.object({
+    title: z.string().max(200).optional(),
+    messageIds: z.array(z.string().uuid()).max(60).optional(),
+  }),
+  FUTURE_LETTER: z.object({
+    showCountdown: z.boolean().optional(),
+  }),
+  FINAL_QUESTION: z.object({
+    showIntro: z.boolean().optional(),
+  }),
+  BUTTON: z.object({
+    text: z.string().min(1).max(100),
+    url: z.string().url().max(2000).optional(),
+    style: z.enum(['primary', 'secondary', 'ghost']).optional(),
+  }),
+} as const;
+
+export type BlockTypeName = keyof typeof BlockContentSchemas;
+
+/**
+ * Validate a block's `content` against the schema for its type. Unknown types
+ * are rejected rather than passed through, so a malformed block can never be
+ * persisted and crash the renderer later.
+ */
+export function parseBlockContent(type: string, content: unknown): Record<string, unknown> {
+  const schema = BlockContentSchemas[type as BlockTypeName];
+  if (!schema) {
+    throw new z.ZodError([
+      { code: 'custom', path: ['type'], message: `Unknown block type: ${type}` },
+    ]);
+  }
+  return schema.parse(content ?? {}) as Record<string, unknown>;
+}
+
+// ─── Publish / share ──────────────────────────────────────────────────────────
+
+export const PublishOptionsSchema = z.object({
+  /** Skip the cover-image requirement — useful for text-only letters. */
+  allowWithoutCover: z.boolean().default(false),
+});
+
+// ─── Inferred types (new) ─────────────────────────────────────────────────────
+
+export type CreateThemeInput = z.infer<typeof CreateThemeSchema>;
+export type UpdateThemeInput = z.infer<typeof UpdateThemeSchema>;
+export type ForkThemeInput = z.infer<typeof ForkThemeSchema>;
+export type ExperienceConfigInput = z.infer<typeof ExperienceConfigSchema>;
+export type ApplyTemplateInput = z.infer<typeof ApplyTemplateSchema>;
+export type CreateFromTemplateInput = z.infer<typeof CreateFromTemplateSchema>;
+export type ApplyPresetInput = z.infer<typeof ApplyPresetSchema>;
+export type PublishOptionsInput = z.infer<typeof PublishOptionsSchema>;
