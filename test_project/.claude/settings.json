@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm *)",
+      "Bash(uv *)",
+      "Bash(pytest *)",
+      "Bash(ruff *)",
+      "Bash(mypy *)",
+      "Bash(docker *)",
+      "Bash(git *)"
+    ]
+  }
+}
