@@ -5,7 +5,7 @@ import { config } from '../config/env';
 import { themeService } from '../services/theme.service';
 import { CreateThemeSchema, ForkThemeSchema, UpdateThemeSchema } from '@letter/validation';
 
-export const themeRouter = Router();
+export const themeRouter: Router = Router();
 
 /**
  * The theme list stays readable without signing in — the recipient view needs

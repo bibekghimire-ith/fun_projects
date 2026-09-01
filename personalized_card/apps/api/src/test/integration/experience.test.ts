@@ -145,7 +145,7 @@ describe('experiences', () => {
 
     expect(res.status).toBe(400);
     expect(res.body.error.code).toBe('NOT_READY');
-    expect(res.body.error.details).toEqual(
+    expect(res.body.error.details.issues).toEqual(
       expect.arrayContaining([expect.objectContaining({ code: 'NO_CONTENT' })]),
     );
   });

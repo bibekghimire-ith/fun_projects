@@ -1,7 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { templateService } from '../services/template.service';
 
-export const templateRouter = Router();
+export const templateRouter: Router = Router();
 
 // Templates and presets are static content shipped with the app, so these are
 // readable without a token — nothing here belongs to a particular creator.

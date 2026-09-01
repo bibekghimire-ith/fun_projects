@@ -7,7 +7,7 @@ import { experienceService } from '../services/experience.service';
 import { config } from '../config/env';
 import { prisma } from '../config/prisma';
 
-export const mediaRouter = Router();
+export const mediaRouter: Router = Router();
 
 const upload = multer({
   storage: multer.memoryStorage(),

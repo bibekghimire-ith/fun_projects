@@ -4,7 +4,7 @@ import { prisma } from '../config/prisma';
 import { experienceService } from '../services/experience.service';
 import { CreateMemorySchema, UpdateMemorySchema, ReorderSchema } from '@letter/validation';
 
-export const memoryRouter = Router();
+export const memoryRouter: Router = Router();
 memoryRouter.use(authenticate);
 
 memoryRouter.get('/experiences/:id/memories', async (req: Request, res: Response, next: NextFunction) => {

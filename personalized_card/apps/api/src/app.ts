@@ -22,7 +22,7 @@ import { templateRouter } from './routes/template.routes';
 import { configRouter } from './routes/config.routes';
 import { publicRouter } from './routes/public.routes';
 
-export function createApp() {
+export function createApp(): express.Express {
   const app = express();
 
   // Security

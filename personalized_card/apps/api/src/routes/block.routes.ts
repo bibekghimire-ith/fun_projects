@@ -10,7 +10,7 @@ import {
   parseBlockContent,
 } from '@letter/validation';
 
-export const blockRouter = Router();
+export const blockRouter: Router = Router();
 blockRouter.use(authenticate);
 
 async function assertSectionOwnership(sectionId: string, userId: string) {

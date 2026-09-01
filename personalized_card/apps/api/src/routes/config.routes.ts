@@ -3,7 +3,7 @@ import { authenticate } from '../middleware/auth';
 import { configService } from '../services/config.service';
 import { ExperienceConfigSchema } from '@letter/validation';
 
-export const configRouter = Router();
+export const configRouter: Router = Router();
 configRouter.use(authenticate);
 
 configRouter.get('/experiences/:id/config', async (req: Request, res: Response, next: NextFunction) => {

@@ -49,11 +49,15 @@ export function useBlockAutosave(experienceId: string, block: ContentBlock) {
         });
         // Patch the cache by hand rather than invalidating: a refetch would
         // race the editor and could pull an older draft back on screen.
-        queryClient.setQueryData<ExperienceSection[]>(keys.sections(experienceId), (sections) =>
-          sections?.map((section) => ({
-            ...section,
-            blocks: section.blocks.map((item) => (item.id === blockId ? updated : item)),
-          })),
+        queryClient.setQueryData<ExperienceSection[]>(
+          keys.sections(experienceId),
+          (sections: ExperienceSection[] | undefined) =>
+            sections?.map((section: ExperienceSection) => ({
+              ...section,
+              blocks: section.blocks.map((item: ContentBlock) =>
+                item.id === blockId ? updated : item,
+              ),
+            })),
         );
         setStatus('saved');
       } catch (error) {

@@ -10,7 +10,7 @@ import {
   UpdateSectionSchema,
 } from '@letter/validation';
 
-export const sectionRouter = Router();
+export const sectionRouter: Router = Router();
 sectionRouter.use(authenticate);
 
 sectionRouter.get('/experiences/:id/sections', async (req: Request, res: Response, next: NextFunction) => {

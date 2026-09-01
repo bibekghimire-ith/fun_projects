@@ -23,7 +23,7 @@ function csvCell(value: string): string {
   return `"${value.replace(/"/g, '""')}"`;
 }
 
-export const experienceRouter = Router();
+export const experienceRouter: Router = Router();
 experienceRouter.use(authenticate);
 
 experienceRouter.get('/experiences', async (req: Request, res: Response, next: NextFunction) => {

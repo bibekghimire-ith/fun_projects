@@ -6,15 +6,17 @@ RUN npm install -g pnpm@9
 COPY pnpm-workspace.yaml package.json pnpm-lock.yaml* tsconfig.base.json ./
 COPY packages/types/package.json ./packages/types/
 COPY packages/validation/package.json ./packages/validation/
+COPY packages/templates/package.json ./packages/templates/
 COPY apps/web/package.json ./apps/web/
 
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --no-frozen-lockfile
 
 COPY packages/ ./packages/
 COPY apps/web/ ./apps/web/
 
 RUN pnpm --filter types build
 RUN pnpm --filter validation build
+RUN pnpm --filter templates build
 RUN pnpm --filter web build
 
 FROM nginx:alpine

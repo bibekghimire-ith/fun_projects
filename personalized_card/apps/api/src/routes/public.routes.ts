@@ -4,7 +4,7 @@ import { publicService } from '../services/public.service';
 import { VerifyPinSchema, SubmitResponseSchema } from '@letter/validation';
 import { config } from '../config/env';
 
-export const publicRouter = Router();
+export const publicRouter: Router = Router();
 
 const publicLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,

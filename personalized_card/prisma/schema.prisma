@@ -254,7 +254,7 @@ model FutureLetter {
   title        String
   content      String
   unlockDate   DateTime
-  mediaId      String?
+  mediaId      String?    @unique
   media        Media?     @relation("FutureLetterMedia", fields: [mediaId], references: [id])
   unlockedAt   DateTime?
   createdAt    DateTime   @default(now())
@@ -273,7 +273,7 @@ model FinalSurprise {
   successMessage String
   responseType   ResponseType @default(YES_NO)
   options        Json?
-  mediaId        String?
+  mediaId        String?      @unique
   media          Media?       @relation("FinalSurpriseMedia", fields: [mediaId], references: [id])
   ctaText        String?
   ctaUrl         String?

@@ -1,4 +1,5 @@
 import { randomUUID } from 'crypto';
+import type { Express } from 'express';
 import request from 'supertest';
 import { createApp } from '../app';
 import { prisma } from '../config/prisma';
@@ -9,7 +10,7 @@ import { prisma } from '../config/prisma';
  * things that ARE process-wide (the PIN lockout map, express-rate-limit
  * counters) are exactly what the security specs mean to exercise.
  */
-export const app = createApp();
+export const app: Express = createApp();
 
 export { prisma };
 

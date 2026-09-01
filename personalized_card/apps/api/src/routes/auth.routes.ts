@@ -6,7 +6,7 @@ import { authenticate } from '../middleware/auth';
 import { config } from '../config/env';
 import { RegisterSchema, LoginSchema } from '@letter/validation';
 
-export const authRouter = Router();
+export const authRouter: Router = Router();
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
