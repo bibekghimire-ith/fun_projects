@@ -1,0 +1,34 @@
+{% extends "base/layout.html" %}
+{% block title %}{{ heading }}{% endblock %}
+{% block content %}
+<main>
+  {% include "admin/_nav.html" %}
+  <h1>Message from {{ message.name }}</h1>
+  <dl>
+    <dt>Name</dt><dd>{{ message.name }}</dd>
+    <dt>Email</dt><dd>{{ message.email }}</dd>
+    <dt>Subject</dt><dd>{{ message.subject or "(none)" }}</dd>
+    <dt>Status</dt><dd>{{ message.status }}</dd>
+    <dt>Received</dt><dd>{{ message.created_at.strftime("%Y-%m-%d %H:%M") }} UTC</dd>
+  </dl>
+  <p>{{ message.message }}</p>
+
+  <form method="post" action="{{ url_for('admin.messages_status', entity_id=message.id) }}" class="d-inline">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="status" value="read">
+    <button type="submit" {% if message.status == "read" %}disabled{% endif %}>Mark read</button>
+  </form>
+  <form method="post" action="{{ url_for('admin.messages_status', entity_id=message.id) }}" class="d-inline">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="status" value="archived">
+    <button type="submit" {% if message.status == "archived" %}disabled{% endif %}>Archive</button>
+  </form>
+  <form method="post" action="{{ url_for('admin.messages_delete', entity_id=message.id) }}" class="d-inline" data-confirm='Delete this message? This cannot be undone.'
+        >
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="submit">Delete</button>
+  </form>
+
+  <p><a href="{{ url_for('admin.messages_list') }}">Back to messages</a></p>
+</main>
+{% endblock %}

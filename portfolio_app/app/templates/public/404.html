@@ -1,0 +1,10 @@
+{% extends "themes/_layout.html" %}
+{% block content %}
+<div class="container theme-{{ theme.key }}-shell">
+  <section class="empty-state-section" aria-labelledby="not-found-heading">
+    <h1 id="not-found-heading">Page not found</h1>
+    <p>The page you requested doesn't exist or may have been moved.</p>
+    <p><a href="{{ url_for('public.home') }}">Return to the homepage</a></p>
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,53 @@
+{#
+Blog post create/edit form. Extends the same generic form pattern every
+other admin entity uses (app/templates/admin/entity_form.html), plus a
+rendered-HTML preview pane: submitting the form (even with validation
+errors) re-renders `markdown_body` through the same sanitize-on-save
+pipeline (app/services/markdown_service.render_markdown, via
+blog_service.preview_html) used at actual save time, so what the admin sees
+here is exactly what will end up in `rendered_body` - no separate
+unsanitized preview path exists.
+#}
+{% extends "base/layout.html" %}
+{% block title %}{{ heading }}{% endblock %}
+{% block extra_head %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/blog.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/pygments.css') }}">
+{% endblock %}
+{% block content %}
+<main>
+  {% include "admin/_nav.html" %}
+  <h1>{{ heading }}</h1>
+  <form method="post" novalidate>
+    {{ form.hidden_tag() }}
+    {% for field in form if field.type != "CSRFTokenField" %}
+      <p>
+        {{ field.label }}<br>
+        {{ field() }}
+        {% if field.errors %}
+          <ul class="field-errors">
+            {% for error in field.errors %}<li>{{ error }}</li>{% endfor %}
+          </ul>
+        {% endif %}
+      </p>
+    {% endfor %}
+    <button type="submit">Save</button>
+  </form>
+  <p><a href="{{ cancel_url }}">Cancel</a></p>
+
+  {% if preview_html is not none %}
+  <section aria-labelledby="preview-heading">
+    <h2 id="preview-heading">Rendered preview (sanitized)</h2>
+    <div class="blog-preview-pane">{{ preview_html | safe }}</div>
+  </section>
+  {% endif %}
+
+  {% if post %}
+  <p>
+    Status: <strong>{{ post.status }}</strong>
+    &middot; <a href="{{ url_for('admin.blog_preview', entity_id=post.id) }}">Full-page preview</a>
+    &middot; <a href="{{ url_for('admin.blog_schedule', entity_id=post.id) }}">Schedule</a>
+  </p>
+  {% endif %}
+</main>
+{% endblock %}

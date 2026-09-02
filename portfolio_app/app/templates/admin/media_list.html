@@ -1,0 +1,60 @@
+{#
+Media uploads (Phase 7): a general-purpose upload form + list, not wired
+directly into any single *_url field - upload here, then paste the shown
+URL into a project/blog-post/profile/resume *_url field. See
+docs/DECISIONS.md for why this integration point was chosen.
+#}
+{% extends "base/layout.html" %}
+{% block title %}{{ heading }}{% endblock %}
+{% block content %}
+<main>
+  {% include "admin/_nav.html" %}
+  <h1>{{ heading }}</h1>
+
+  <form method="post" enctype="multipart/form-data" novalidate>
+    {{ form.hidden_tag() }}
+    <p>
+      {{ form.file.label }}<br>
+      {{ form.file() }}
+      {% if form.file.errors %}
+        <ul class="field-errors">
+          {% for error in form.file.errors %}<li>{{ error }}</li>{% endfor %}
+        </ul>
+      {% endif %}
+    </p>
+    <button type="submit">Upload</button>
+  </form>
+
+  <table>
+    <caption class="visually-hidden">Uploaded media</caption>
+    <thead>
+      <tr>
+        <th scope="col">File</th>
+        <th scope="col">Type</th>
+        <th scope="col">Size</th>
+        <th scope="col">URL</th>
+        <th scope="col">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+      <tr>
+        <td>{{ row.asset.original_filename }}</td>
+        <td>{{ row.asset.content_type }}</td>
+        <td>{{ (row.asset.size_bytes / 1024) | round(1) }} KB</td>
+        <td><input type="text" readonly value="{{ row.url }}" class="select-on-click"></td>
+        <td>
+          <form method="post" action="{{ row.delete_url }}" class="d-inline" data-confirm='Delete this image? This cannot be undone.'
+                >
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" aria-label="Delete {{ row.asset.original_filename }}">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="5">No uploads yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</main>
+{% endblock %}

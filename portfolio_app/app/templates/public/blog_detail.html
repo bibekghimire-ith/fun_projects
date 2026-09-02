@@ -1,0 +1,53 @@
+{#
+Renders `post.rendered_body` - the sanitized HTML computed at save time by
+app/services/markdown_service.render_markdown (see
+app/services/blog_service.py's `_apply_fields`). This is the ONLY place any
+blog post's body reaches a browser; `| safe` is used here specifically
+because `rendered_body` has already been through bleach's allowlist
+sanitizer, never on raw `markdown_body` - see CLAUDE.md rule #14 ("Sanitize
+rendered blog HTML") and docs/DECISIONS.md.
+
+OpenGraph/Twitter Card tags (Phase 6): built from `_og_context()` in
+app/public/routes.py, which chooses `og:image` (falling back to the
+profile's own image when the post has no cover image - documented in
+docs/DECISIONS.md) and the absolute `og:url` (built from the configured
+BASE_URL, not the request Host header - see docs/DECISIONS.md's SSRF/host-
+header note).
+#}
+{% extends "themes/_layout.html" %}
+{% import "base/_content_components.html" as content %}
+{% block extra_head %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/blog.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/pygments.css') }}">
+  {% if page_title %}<meta property="og:title" content="{{ og_title or page_title }}">{% endif %}
+  {% if meta_description %}<meta property="og:description" content="{{ og_description or meta_description }}">{% endif %}
+  <meta property="og:type" content="article">
+  {% if og_url %}<meta property="og:url" content="{{ og_url }}">{% endif %}
+  <meta property="og:site_name" content="{{ og_site_name or 'Portfolio' }}">
+  {% if og_image %}<meta property="og:image" content="{{ og_image }}">{% endif %}
+  <meta name="twitter:card" content="{{ 'summary_large_image' if og_image else 'summary' }}">
+  {% if og_title %}<meta name="twitter:title" content="{{ og_title }}">{% endif %}
+  {% if og_description %}<meta name="twitter:description" content="{{ og_description }}">{% endif %}
+  {% if og_image %}<meta name="twitter:image" content="{{ og_image }}">{% endif %}
+{% endblock %}
+{% block content %}
+<div class="container theme-{{ theme.key }}-shell">
+  <article class="blog-post-detail" aria-labelledby="blog-post-heading">
+    <h1 id="blog-post-heading">{{ post.title }}</h1>
+    {{ content.blog_post_meta(post) }}
+    {% if reading_time_value %}
+      <p class="blog-reading-time">{{ reading_time_value }} min read</p>
+    {% endif %}
+    {% if post.cover_image_url %}
+      <img
+        class="blog-post-cover-image"
+        src="{{ post.cover_image_url }}"
+        alt="Cover image for {{ post.title }}"
+      >
+    {% endif %}
+    <div class="blog-post-body">{{ post.rendered_body | safe }}</div>
+    <p><a href="{{ url_for('public.blog_home') }}">&larr; Back to all posts</a></p>
+  </article>
+  {{ content.related_posts_section(related_posts) }}
+</div>
+{% endblock %}

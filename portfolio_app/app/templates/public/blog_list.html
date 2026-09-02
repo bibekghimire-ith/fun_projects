@@ -1,0 +1,13 @@
+{% extends "themes/_layout.html" %}
+{% import "base/_content_components.html" as content %}
+{% block extra_head %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/blog.css') }}">
+{% endblock %}
+{% block content %}
+<div class="container theme-{{ theme.key }}-shell">
+  <h1 class="visually-hidden">{{ heading or "Blog" }}</h1>
+  {{ content.blog_search_form(search_query or "") }}
+  {{ content.blog_post_list(posts, heading or "Blog", reading_time or {}) }}
+  {{ content.blog_pagination(pagination, pagination_endpoint, pagination_kwargs or {}) }}
+</div>
+{% endblock %}

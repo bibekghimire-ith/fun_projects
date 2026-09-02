@@ -1,0 +1,10 @@
+{% extends "themes/_layout.html" %}
+{% import "base/_content_components.html" as content %}
+{% block content %}
+<div class="container theme-academic-shell">
+  <p class="document-kicker">Curriculum Vitae</p>
+  {{ content.portfolio_hero(profile) }}
+  <p class="document-kicker">Positions Held</p>
+  {{ content.experience_list(experiences) }}
+</div>
+{% endblock %}

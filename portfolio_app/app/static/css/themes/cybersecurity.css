@@ -1,0 +1,64 @@
+/* Cybersecurity / Engineering theme: dark, technical, high-contrast accents. */
+
+.theme-cybersecurity {
+  --portfolio-font-body: system-ui, sans-serif;
+  --portfolio-font-heading: "SFMono-Regular", Consolas, monospace;
+  --portfolio-accent: #00e5c7;
+  --portfolio-radius: 0.1rem;
+
+  --portfolio-bg: #05070a;
+  --portfolio-surface: #0c1117;
+  --portfolio-text: #d3f8f2;
+  --portfolio-muted: #6f8b8a;
+  --portfolio-border: #1c2c30;
+}
+
+html[data-bs-theme="light"] .theme-cybersecurity {
+  --portfolio-bg: #eef4f4;
+  --portfolio-surface: #ffffff;
+  --portfolio-text: #062a27;
+  --portfolio-muted: #3f5a58;
+  --portfolio-border: #bcd6d3;
+  --portfolio-accent: #067d6c;
+}
+
+.theme-cybersecurity-shell {
+  max-width: 840px;
+  padding: 1.5rem 0 2.5rem;
+}
+
+.theme-cybersecurity .scan-line {
+  font-family: var(--portfolio-font-heading);
+  color: var(--portfolio-accent);
+  letter-spacing: 0.12em;
+  font-size: 0.8rem;
+  margin: 1.5rem 0 0.5rem;
+}
+
+.theme-cybersecurity .hud-panel {
+  border: 1px solid var(--portfolio-accent);
+  background: var(--portfolio-surface);
+  padding: 1.25rem 1.5rem;
+  position: relative;
+}
+
+.theme-cybersecurity .hud-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--portfolio-border);
+  margin: 4px;
+  pointer-events: none;
+}
+
+.theme-cybersecurity h1,
+.theme-cybersecurity h2 {
+  font-family: var(--portfolio-font-heading);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.theme-cybersecurity .skill-badge {
+  border-color: var(--portfolio-accent);
+  font-family: var(--portfolio-font-heading);
+}

@@ -1,0 +1,13 @@
+{% extends "themes/_layout.html" %}
+{% import "base/_content_components.html" as content %}
+{% block content %}
+<div class="container theme-modern-shell">
+  <div class="modern-card">
+    {{ content.portfolio_hero(profile) }}
+  </div>
+  <div class="modern-card">
+    <p class="section-eyebrow">Career History</p>
+    {{ content.experience_list(experiences) }}
+  </div>
+</div>
+{% endblock %}

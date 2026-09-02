@@ -1,0 +1,8 @@
+{% extends "themes/_layout.html" %}
+{% import "base/_content_components.html" as content %}
+{% block content %}
+<div class="container theme-{{ theme.key }}-shell">
+  <h1 class="visually-hidden">Contact</h1>
+  {{ content.contact_panel(profile, form, submitted) }}
+</div>
+{% endblock %}

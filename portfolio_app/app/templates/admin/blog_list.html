@@ -1,0 +1,69 @@
+{% extends "base/layout.html" %}
+{% block title %}{{ heading }}{% endblock %}
+{% block content %}
+<main>
+  {% include "admin/_nav.html" %}
+  <h1>{{ heading }}</h1>
+  <p><a href="{{ url_for('admin.blog_new') }}">Write new post</a></p>
+  <p>
+    <a href="{{ url_for('admin.blog_categories_list') }}">Manage categories</a>
+    &middot;
+    <a href="{{ url_for('admin.blog_tags_list') }}">Manage tags</a>
+  </p>
+  <nav aria-label="Filter by status">
+    <ul>
+      <li><a href="{{ url_for('admin.blog_list') }}" {% if not status_filter %}aria-current="page"{% endif %}>All</a></li>
+      <li><a href="{{ url_for('admin.blog_list', status='draft') }}" {% if status_filter == 'draft' %}aria-current="page"{% endif %}>Draft</a></li>
+      <li><a href="{{ url_for('admin.blog_list', status='scheduled') }}" {% if status_filter == 'scheduled' %}aria-current="page"{% endif %}>Scheduled</a></li>
+      <li><a href="{{ url_for('admin.blog_list', status='published') }}" {% if status_filter == 'published' %}aria-current="page"{% endif %}>Published</a></li>
+    </ul>
+  </nav>
+  <table>
+    <caption class="visually-hidden">{{ heading }}</caption>
+    <thead>
+      <tr>
+        <th scope="col">Title</th>
+        <th scope="col">Status</th>
+        <th scope="col">Featured</th>
+        <th scope="col">Published</th>
+        <th scope="col">Scheduled</th>
+        <th scope="col">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for post in posts %}
+      <tr>
+        <td>{{ post.title }}</td>
+        <td>{{ post.status }}</td>
+        <td>{{ "Yes" if post.featured else "No" }}</td>
+        <td>{{ post.published_at.isoformat() if post.published_at else "" }}</td>
+        <td>{{ post.scheduled_at.isoformat() if post.scheduled_at else "" }}</td>
+        <td>
+          <a href="{{ url_for('admin.blog_edit', entity_id=post.id) }}">Edit</a>
+          <a href="{{ url_for('admin.blog_preview', entity_id=post.id) }}">Preview</a>
+          {% if post.status != "published" %}
+          <form method="post" action="{{ url_for('admin.blog_publish', entity_id=post.id) }}" class="d-inline">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit">Publish</button>
+          </form>
+          {% else %}
+          <form method="post" action="{{ url_for('admin.blog_unpublish', entity_id=post.id) }}" class="d-inline">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit">Unpublish</button>
+          </form>
+          {% endif %}
+          <a href="{{ url_for('admin.blog_schedule', entity_id=post.id) }}">Schedule</a>
+          <form method="post" action="{{ url_for('admin.blog_delete', entity_id=post.id) }}" class="d-inline" data-confirm='Delete this post? This cannot be undone.'
+                >
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" aria-label="Delete {{ post.title }}">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6">No posts yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</main>
+{% endblock %}

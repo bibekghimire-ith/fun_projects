@@ -1,0 +1,64 @@
+/* Creative theme: bold, expressive, gradient accent banner. */
+
+.theme-creative {
+  --portfolio-font-body: "Poppins", "Segoe UI", sans-serif;
+  --portfolio-font-heading: var(--portfolio-font-body);
+  --portfolio-accent: #ff3d81;
+  --portfolio-radius: 1.25rem;
+
+  --portfolio-bg: #fffaf5;
+  --portfolio-surface: #ffffff;
+  --portfolio-text: #201326;
+  --portfolio-muted: #6c5b73;
+  --portfolio-border: #f0d9e6;
+}
+
+html[data-bs-theme="dark"] .theme-creative {
+  --portfolio-bg: #170f1c;
+  --portfolio-surface: #241a2c;
+  --portfolio-text: #f8ecf3;
+  --portfolio-muted: #c6b3cf;
+  --portfolio-border: #3a2846;
+  --portfolio-accent: #ff6fa5;
+}
+
+.theme-creative-shell .container {
+  max-width: 840px;
+  padding-bottom: 3rem;
+}
+
+.theme-creative .creative-banner {
+  background: linear-gradient(135deg, var(--portfolio-accent), #7c4dff);
+  color: #ffffff;
+  padding: 3rem 1.5rem;
+}
+
+.theme-creative .creative-banner .hero-title,
+.theme-creative .creative-banner .hero-tagline,
+.theme-creative .creative-banner .hero-meta-item dt {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.theme-creative .creative-banner .social-links a {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+.theme-creative .hero-name {
+  font-size: 2.5rem;
+  font-weight: 800;
+}
+
+.theme-creative .creative-journey-heading {
+  margin-top: 2rem;
+  font-size: 1.75rem;
+  font-weight: 800;
+}
+
+.theme-creative .experience-item {
+  border-left: none;
+  background: var(--portfolio-surface);
+  border-radius: var(--portfolio-radius);
+  padding: 1rem 1.25rem;
+  box-shadow: 0 2px 10px rgba(124, 77, 255, 0.12);
+}

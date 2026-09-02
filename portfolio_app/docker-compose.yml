@@ -1,0 +1,120 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-portfolio}
+      POSTGRES_USER: ${POSTGRES_USER:-portfolio}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-portfolio}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-portfolio} -d ${POSTGRES_DB:-portfolio}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    ports:
+      - "5432:5432"
+
+  app:
+    build:
+      context: .
+      target: runtime
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment: &app_environment
+      FLASK_APP: wsgi.py
+      APP_ENV: ${APP_ENV:-production}
+      SECRET_KEY: ${SECRET_KEY:?SECRET_KEY must be set}
+      DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg://portfolio:portfolio@db:5432/portfolio}
+      BASE_URL: ${BASE_URL:-http://localhost:8000}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      SESSION_COOKIE_SECURE: ${SESSION_COOKIE_SECURE:-false}
+      ENABLE_HSTS: ${ENABLE_HSTS:-false}
+      # Only set to "true" (with the `proxy` Nginx service, or your own
+      # reverse proxy, actually in front) - see app/config.py and
+      # docs/DECISIONS.md. Left off by default so a plain
+      # `docker compose up` (no proxy) doesn't trust spoofable
+      # X-Forwarded-* headers from directly-connected clients.
+      TRUST_PROXY_HEADERS: ${TRUST_PROXY_HEADERS:-false}
+      PROXY_COUNT: ${PROXY_COUNT:-1}
+      ADMIN_BOOTSTRAP_EMAIL: ${ADMIN_BOOTSTRAP_EMAIL:-}
+      ADMIN_BOOTSTRAP_PASSWORD_HASH: ${ADMIN_BOOTSTRAP_PASSWORD_HASH:-}
+      ADMIN_BOOTSTRAP_PASSWORD: ${ADMIN_BOOTSTRAP_PASSWORD:-}
+    ports:
+      - "8000:8000"
+    # Single-instance deployment (this app's target - see
+    # docs/DECISIONS.md #14 on RATELIMIT_STORAGE_URI): running
+    # `flask db upgrade` as part of the container's own startup command is
+    # safe here because there is only ever one instance to race with
+    # itself, and both `flask db upgrade` and `flask bootstrap-admin` are
+    # idempotent (safe to re-run on every restart). If you scale `app` to
+    # more than one replica, switch to the `migrate` one-shot service
+    # below instead (`docker compose run --rm migrate`) run once
+    # before starting/scaling `app`, and drop `flask db upgrade` from this
+    # command - see docs/DEPLOYMENT.md's "Migration procedure" section.
+    command: >
+      sh -c "flask db upgrade && flask bootstrap-admin && exec gunicorn -c gunicorn.conf.py wsgi:app"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8000/healthz"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    # Container hardening (Phase 8) - see docs/DECISIONS.md.
+    read_only: true
+    tmpfs:
+      - /tmp
+    volumes:
+      - media_uploads:/app/instance
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+
+  # One-shot migration job for a multi-instance/scaled deployment - see the
+  # comment on `app.command` above and docs/DEPLOYMENT.md. Not started by a
+  # plain `docker compose up` (profile-gated); run explicitly with:
+  #   docker compose run --rm migrate
+  migrate:
+    build:
+      context: .
+      target: runtime
+    profiles: ["migrate"]
+    depends_on:
+      db:
+        condition: service_healthy
+    environment: *app_environment
+    command: ["sh", "-c", "flask db upgrade && flask bootstrap-admin"]
+    volumes:
+      - media_uploads:/app/instance
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+
+  # Optional Nginx reverse proxy (docs/DEPLOYMENT.md's recommended
+  # production topology). Not started by a plain `docker compose up`
+  # (profile-gated); run with:
+  #   docker compose --profile proxy up --build
+  # Provide your own TLS certs (see deploy/nginx/portfolio.conf) via a bind
+  # mount before using this in production - the sample config as shipped
+  # references certificate paths you must supply.
+  proxy:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    profiles: ["proxy"]
+    depends_on:
+      - app
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/nginx/portfolio.conf:/etc/nginx/conf.d/default.conf:ro
+    security_opt:
+      - no-new-privileges:true
+
+volumes:
+  postgres_data:
+  media_uploads:

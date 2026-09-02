@@ -1,0 +1,8 @@
+{% extends "themes/_layout.html" %}
+{% import "base/_content_components.html" as content %}
+{% block content %}
+<div class="container theme-{{ theme.key }}-shell">
+  <h1 class="visually-hidden">Resume</h1>
+  {{ content.resume_panel(resume) }}
+</div>
+{% endblock %}

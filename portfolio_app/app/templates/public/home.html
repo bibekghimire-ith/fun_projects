@@ -1,0 +1,22 @@
+{% extends "themes/_layout.html" %}
+{% import "base/_content_components.html" as content %}
+{% block content %}
+<div class="container theme-{{ theme.key }}-shell">
+  {% if profile %}
+    {{ content.portfolio_hero(profile) }}
+    {% set featured_projects = profile.projects | selectattr("visible") | selectattr("featured") | list %}
+    {% if featured_projects %}
+      {{ content.project_grid(featured_projects, heading="Featured projects") }}
+      <p><a href="{{ url_for('public.projects') }}">View all projects &rarr;</a></p>
+    {% endif %}
+    {% if profile.experiences %}
+      {{ content.experience_list(profile.experiences) }}
+    {% endif %}
+  {% else %}
+    <section class="empty-state-section" aria-labelledby="empty-heading">
+      <h1 id="empty-heading">Portfolio coming soon</h1>
+      <p class="empty-state">This portfolio hasn't been configured yet. Check back soon.</p>
+    </section>
+  {% endif %}
+</div>
+{% endblock %}
