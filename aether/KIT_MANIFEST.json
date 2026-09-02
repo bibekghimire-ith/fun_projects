@@ -1,0 +1,12 @@
+{
+  "project": "AETHER",
+  "default_name_configurable": true,
+  "mvp": "MVP-3",
+  "backend": "Python/FastAPI",
+  "frontend": "React/TypeScript/Vite",
+  "database": "PostgreSQL + pgvector",
+  "local_ai": "Ollama-compatible",
+  "browser": "Playwright",
+  "deployment": "Docker Compose",
+  "files": 65
+}

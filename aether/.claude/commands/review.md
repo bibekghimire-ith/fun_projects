@@ -1,0 +1,1 @@
+Act as principal engineer. Review architecture, security, permissions, prompt injection, isolation, tests, Docker portability, maintainability and scalability. Prioritize findings.

@@ -1,0 +1,1 @@
+Run tests, lint and type checks. Fix implementation defects. Never weaken tests merely to make them pass.

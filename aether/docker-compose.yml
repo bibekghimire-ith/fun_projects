@@ -1,0 +1,42 @@
+services:
+  api:
+    build: ./backend
+    env_file: .env
+    ports: ["8000:8000"]
+    depends_on: [postgres, redis, ollama]
+    volumes: ["./backend:/app", "aether_data:/data"]
+
+  web:
+    build: ./frontend
+    ports: ["3000:3000"]
+    depends_on: [api]
+
+  worker:
+    build: ./backend
+    command: python -m app.worker
+    env_file: .env
+    depends_on: [postgres, redis, ollama]
+    volumes: ["./backend:/app", "aether_data:/data"]
+
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: aether
+      POSTGRES_USER: aether
+      POSTGRES_PASSWORD: aether
+    ports: ["5432:5432"]
+    volumes: ["postgres_data:/var/lib/postgresql/data"]
+
+  redis:
+    image: redis:7-alpine
+    ports: ["6379:6379"]
+
+  ollama:
+    image: ollama/ollama:latest
+    ports: ["11434:11434"]
+    volumes: ["ollama_data:/root/.ollama"]
+
+volumes:
+  postgres_data:
+  ollama_data:
+  aether_data:
