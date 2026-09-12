@@ -1,0 +1,1 @@
+Read CLAUDE.md and relevant docs. Inspect the repository. Produce a concrete implementation plan. Do not modify code yet.

@@ -1,0 +1,21 @@
+# Countdown / Ask for Date-Trip — Delivery Checklist
+
+- [ ] Domain model
+- [ ] Migration
+- [ ] Repository/service layer
+- [ ] API validation
+- [ ] Authorization
+- [ ] Feature flag enforcement
+- [ ] Admin configuration
+- [ ] Recipient experience
+- [ ] Empty/loading/error states
+- [ ] Accessibility
+- [ ] Responsive design
+- [ ] Template registry
+- [ ] Multiple polished templates
+- [ ] Unit tests
+- [ ] Integration tests
+- [ ] Playwright E2E
+- [ ] Security tests
+- [ ] Documentation
+- [ ] Docker verification

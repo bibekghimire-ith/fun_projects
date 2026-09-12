@@ -1,0 +1,26 @@
+{% extends "admin/layout.html" %}
+{% block title %}Projects{% endblock %}
+{% block content %}
+<h1>&gt; projects_</h1>
+<a class="btn" href="/admin/projects/new">+ new project</a>
+<table class="admin-table">
+  <thead><tr><th>image</th><th>title</th><th>featured</th><th>order</th><th></th></tr></thead>
+  <tbody>
+    {% for project in projects %}
+    <tr>
+      <td>{% if project.image_url %}<img class="admin-thumb" src="{{ project.image_url }}" alt="">{% endif %}</td>
+      <td><a href="/admin/projects/{{ project.id }}/edit">{{ project.title }}</a></td>
+      <td>{{ "yes" if project.featured else "no" }}</td>
+      <td>{{ project.order_index }}</td>
+      <td>
+        <form method="post" action="/admin/projects/{{ project.id }}/delete" onsubmit="return confirm('Delete this project?');" style="display:inline">
+          <button class="link-btn" type="submit">delete</button>
+        </form>
+      </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="5">No projects yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

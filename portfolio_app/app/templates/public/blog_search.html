@@ -1,0 +1,31 @@
+{#
+Dedicated search-results page (Phase 6, GET /blog/search?q=...). Kept as its
+own template (rather than reusing blog_list.html) only because it needs a
+distinct empty state ("no results for X" vs. blog_list's generic "no blog
+posts yet") and shows the search box pre-filled with the current query -
+everything else (post cards, pagination) reuses the exact same shared
+macros blog_list.html uses.
+#}
+{% extends "themes/_layout.html" %}
+{% import "base/_content_components.html" as content %}
+{% block extra_head %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/blog.css') }}">
+{% endblock %}
+{% block content %}
+<div class="container theme-{{ theme.key }}-shell">
+  <h1 id="blog-search-heading">{{ heading }}</h1>
+  {{ content.blog_search_form(search_query or "") }}
+  {% if search_query %}
+    {% if posts %}
+      <div class="blog-post-list">
+        {% for post in posts %}{{ content.blog_post_card(post, (reading_time or {}).get(post.id)) }}{% endfor %}
+      </div>
+      {{ content.blog_pagination(pagination, pagination_endpoint, pagination_kwargs or {}) }}
+    {% else %}
+      <p class="empty-state">No posts matched &ldquo;{{ search_query }}&rdquo;.</p>
+    {% endif %}
+  {% else %}
+    <p class="empty-state">Enter a search term above to search the blog.</p>
+  {% endif %}
+</div>
+{% endblock %}

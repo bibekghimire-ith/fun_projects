@@ -1,0 +1,12 @@
+{% extends "themes/_layout.html" %}
+{% import "base/_content_components.html" as content %}
+{% block content %}
+<div class="container theme-{{ theme.key }}-shell">
+  <h1 class="visually-hidden">Education</h1>
+  {% if profile %}
+    {{ content.education_list(profile.educations) }}
+  {% else %}
+    <p class="empty-state">No education has been published yet.</p>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,46 @@
+{#
+Contact messages list (Phase 7). Not built on entity_list.html - ContactMessage
+has no OrderingMixin/VisibilityMixin (it isn't reorderable/hideable content,
+it's an inbox), and needs a status filter + "unread" indicator instead.
+#}
+{% extends "base/layout.html" %}
+{% block title %}{{ heading }}{% endblock %}
+{% block content %}
+<main>
+  {% include "admin/_nav.html" %}
+  <h1>{{ heading }}</h1>
+  <nav aria-label="Filter by status">
+    <a href="{{ url_for('admin.messages_list') }}" {% if not status_filter %}aria-current="page"{% endif %}>All</a>
+    | <a href="{{ url_for('admin.messages_list', status='new') }}" {% if status_filter == 'new' %}aria-current="page"{% endif %}>New</a>
+    | <a href="{{ url_for('admin.messages_list', status='read') }}" {% if status_filter == 'read' %}aria-current="page"{% endif %}>Read</a>
+    | <a href="{{ url_for('admin.messages_list', status='archived') }}" {% if status_filter == 'archived' %}aria-current="page"{% endif %}>Archived</a>
+  </nav>
+  <table>
+    <caption class="visually-hidden">{{ heading }}</caption>
+    <thead>
+      <tr>
+        <th scope="col">Status</th>
+        <th scope="col">Name</th>
+        <th scope="col">Email</th>
+        <th scope="col">Subject</th>
+        <th scope="col">Received</th>
+        <th scope="col">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for message in messages %}
+      <tr>
+        <td>{{ message.status }}</td>
+        <td>{{ message.name }}</td>
+        <td>{{ message.email }}</td>
+        <td>{{ message.subject or "" }}</td>
+        <td>{{ message.created_at.strftime("%Y-%m-%d %H:%M") }} UTC</td>
+        <td><a href="{{ url_for('admin.messages_detail', entity_id=message.id) }}">View</a></td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6">No messages yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</main>
+{% endblock %}

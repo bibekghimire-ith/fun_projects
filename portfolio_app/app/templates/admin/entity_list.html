@@ -1,0 +1,51 @@
+{% extends "base/layout.html" %}
+{% block title %}{{ heading }}{% endblock %}
+{% block content %}
+<main>
+  {% include "admin/_nav.html" %}
+  <h1>{{ heading }}</h1>
+  <p><a href="{{ new_url }}">Add new</a></p>
+  {% if back_url %}<p><a href="{{ back_url }}">Back</a></p>{% endif %}
+  <table>
+    <caption class="visually-hidden">{{ heading }}</caption>
+    <thead>
+      <tr>
+        {% for label in column_labels %}<th scope="col">{{ label }}</th>{% endfor %}
+        <th scope="col">Visible</th>
+        <th scope="col">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+      <tr>
+        {% for value in row.columns %}<td>{{ value }}</td>{% endfor %}
+        <td>{{ "Yes" if row.visible else "No" }}</td>
+        <td>
+          {% if row.extra_actions %}
+            {% for extra_label, extra_url in row.extra_actions %}
+              <a href="{{ extra_url }}">{{ extra_label }}</a>
+            {% endfor %}
+          {% endif %}
+          <a href="{{ row.edit_url }}">Edit</a>
+          <form method="post" action="{{ row.move_up_url }}" class="d-inline">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" aria-label="Move {{ row.label }} up">Move up</button>
+          </form>
+          <form method="post" action="{{ row.move_down_url }}" class="d-inline">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" aria-label="Move {{ row.label }} down">Move down</button>
+          </form>
+          <form method="post" action="{{ row.delete_url }}" class="d-inline" data-confirm='Delete this item? This cannot be undone.'
+                >
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" aria-label="Delete {{ row.label }}">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="{{ column_labels|length + 2 }}">No items yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</main>
+{% endblock %}

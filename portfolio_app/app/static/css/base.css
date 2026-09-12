@@ -1,0 +1,515 @@
+/*
+Shared base styles for every theme's preview page.
+
+Defines the CSS custom properties every theme/*.css file overrides (never
+redefines the selectors that use them), plus small structural rules
+(skip link, preview banner, toggle button) that are identical regardless
+of which theme is active. Per CLAUDE.md's "prefer ... theme-specific
+CSS/layout fragments" - this file intentionally carries *no* visual
+identity of its own beyond sane fallbacks, so a missing theme stylesheet
+still renders something readable.
+*/
+
+:root {
+  --portfolio-bg: #ffffff;
+  --portfolio-surface: #f5f5f5;
+  --portfolio-text: #1a1a1a;
+  --portfolio-muted: #5a5a5a;
+  --portfolio-accent: #2952e3;
+  --portfolio-border: #d9d9d9;
+  --portfolio-font-body: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --portfolio-font-heading: var(--portfolio-font-body);
+  --portfolio-radius: 0.5rem;
+}
+
+[data-bs-theme="dark"] {
+  --portfolio-bg: #10121a;
+  --portfolio-surface: #181b26;
+  --portfolio-text: #eef0f6;
+  --portfolio-muted: #a3a8bd;
+  --portfolio-accent: #7c9bff;
+  --portfolio-border: #2c3040;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--portfolio-bg);
+  color: var(--portfolio-text);
+  font-family: var(--portfolio-font-body);
+  margin: 0;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+h1, h2, h3 {
+  font-family: var(--portfolio-font-heading);
+}
+
+.skip-link {
+  position: absolute;
+  top: -3rem;
+  left: 0.5rem;
+  background: var(--portfolio-accent);
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: var(--portfolio-radius);
+  z-index: 1000;
+}
+
+.skip-link:focus {
+  top: 0.5rem;
+}
+
+.preview-banner {
+  background: var(--portfolio-surface);
+  border-bottom: 1px solid var(--portfolio-border);
+  font-size: 0.9rem;
+}
+
+.theme-toggle-btn {
+  background: transparent;
+  border: 1px solid var(--portfolio-border);
+  color: var(--portfolio-text);
+  border-radius: var(--portfolio-radius);
+  padding: 0.35rem 0.75rem;
+  cursor: pointer;
+}
+
+.theme-toggle-btn:focus-visible {
+  outline: 2px solid var(--portfolio-accent);
+  outline-offset: 2px;
+}
+
+.hero {
+  padding: 2rem 0;
+}
+
+.hero-avatar {
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 1rem;
+}
+
+.hero-name {
+  margin: 0 0 0.25rem;
+}
+
+.hero-title,
+.hero-tagline {
+  color: var(--portfolio-muted);
+  margin: 0.15rem 0;
+}
+
+.hero-meta {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin: 1rem 0;
+}
+
+.hero-meta-item dt {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--portfolio-muted);
+}
+
+.hero-meta-item dd {
+  margin: 0;
+}
+
+.social-links {
+  list-style: none;
+  display: flex;
+  gap: 1rem;
+  padding: 0;
+  margin: 1rem 0 0;
+}
+
+.social-links a {
+  color: var(--portfolio-accent);
+}
+
+.experience-section,
+.skills-section {
+  padding: 1.5rem 0;
+}
+
+.experience-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.experience-item {
+  border-left: 3px solid var(--portfolio-accent);
+  padding-left: 1rem;
+}
+
+.experience-role {
+  margin: 0;
+  font-weight: 600;
+}
+
+.experience-company {
+  color: var(--portfolio-muted);
+  font-weight: 400;
+  margin-left: 0.4rem;
+}
+
+.experience-dates {
+  color: var(--portfolio-muted);
+  font-size: 0.9rem;
+  margin: 0.15rem 0;
+}
+
+.skill-badges {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0;
+}
+
+.skill-badge {
+  background: var(--portfolio-surface);
+  border: 1px solid var(--portfolio-border);
+  border-radius: var(--portfolio-radius);
+  padding: 0.25rem 0.65rem;
+  font-size: 0.9rem;
+}
+
+.empty-state {
+  color: var(--portfolio-muted);
+  font-style: italic;
+}
+
+.empty-state-section {
+  padding: 3rem 0;
+}
+
+/* --- Public site header / nav (Phase 4) --------------------------------- */
+
+.site-header {
+  background: var(--portfolio-surface);
+  border-bottom: 1px solid var(--portfolio-border);
+}
+
+.site-header-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 0;
+}
+
+.site-logo {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--portfolio-text);
+  text-decoration: none;
+}
+
+.nav-toggle {
+  display: none;
+  background: transparent;
+  border: 1px solid var(--portfolio-border);
+  border-radius: var(--portfolio-radius);
+  color: var(--portfolio-text);
+  padding: 0.35rem 0.6rem;
+  cursor: pointer;
+}
+
+.site-nav ul {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  margin: 0;
+  padding: 0;
+}
+
+.site-nav a {
+  color: var(--portfolio-text);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.site-nav a:hover,
+.site-nav a:focus-visible {
+  color: var(--portfolio-accent);
+}
+
+.site-nav a[aria-current="page"] {
+  color: var(--portfolio-accent);
+  border-bottom: 2px solid var(--portfolio-accent);
+}
+
+.site-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+@media (max-width: 767px) {
+  .nav-toggle {
+    display: inline-flex;
+  }
+
+  .site-nav {
+    flex-basis: 100%;
+    display: none;
+  }
+
+  .site-nav.site-nav-open {
+    display: block;
+  }
+
+  .site-nav ul {
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0.75rem 0;
+  }
+}
+
+/* --- Public site footer ------------------------------------------------- */
+
+.site-footer {
+  border-top: 1px solid var(--portfolio-border);
+  margin-top: 3rem;
+  padding: 1.5rem 0;
+  color: var(--portfolio-muted);
+}
+
+.site-footer .social-links {
+  margin-bottom: 0.75rem;
+}
+
+.footer-copyright {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+/* --- Education / certifications / achievements lists --------------------- */
+
+.education-section,
+.certifications-section,
+.achievements-section,
+.projects-section,
+.resume-section,
+.contact-section,
+.skill-categories-section {
+  padding: 1.5rem 0;
+}
+
+.education-list,
+.certification-list,
+.achievement-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.education-item,
+.certification-item,
+.achievement-item {
+  border-left: 3px solid var(--portfolio-accent);
+  padding-left: 1rem;
+}
+
+.education-institution-name,
+.certification-name,
+.achievement-title {
+  font-weight: 600;
+  margin: 0;
+}
+
+.education-degree {
+  color: var(--portfolio-muted);
+  font-weight: 400;
+  margin-left: 0.4rem;
+}
+
+.education-field,
+.education-dates,
+.certification-issuer,
+.certification-date,
+.achievement-issuer,
+.achievement-date {
+  color: var(--portfolio-muted);
+  font-size: 0.9rem;
+  margin: 0.15rem 0;
+}
+
+.skill-category {
+  margin-bottom: 1.5rem;
+}
+
+.skill-category h3 {
+  margin-bottom: 0.5rem;
+}
+
+/* --- Projects grid / cards ------------------------------------------------ */
+
+.project-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.5rem;
+}
+
+.project-card {
+  background: var(--portfolio-surface);
+  border: 1px solid var(--portfolio-border);
+  border-radius: var(--portfolio-radius);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.project-card-image {
+  width: 100%;
+  height: auto;
+  border-radius: var(--portfolio-radius);
+  object-fit: cover;
+}
+
+.project-card-title {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.project-card-title a {
+  color: var(--portfolio-text);
+  text-decoration: none;
+}
+
+.project-card-title a:hover,
+.project-card-title a:focus-visible {
+  color: var(--portfolio-accent);
+}
+
+.project-card-description {
+  color: var(--portfolio-muted);
+  margin: 0;
+}
+
+.project-tech-list {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding: 0;
+  margin: 0;
+}
+
+.project-tech-list li {
+  background: var(--portfolio-bg);
+  border: 1px solid var(--portfolio-border);
+  border-radius: var(--portfolio-radius);
+  padding: 0.1rem 0.5rem;
+  font-size: 0.8rem;
+}
+
+.project-detail-image {
+  width: 100%;
+  max-width: 720px;
+  height: auto;
+  border-radius: var(--portfolio-radius);
+  margin: 1rem 0;
+}
+
+.project-detail-tagline {
+  color: var(--portfolio-muted);
+}
+
+.project-links {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 0;
+  margin: 1rem 0;
+}
+
+/* --- Contact form (Phase 7 - server-validated, CSRF-protected) ----------- */
+
+.contact-form {
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.form-field label {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.form-field input,
+.form-field textarea {
+  border: 1px solid var(--portfolio-border);
+  border-radius: var(--portfolio-radius);
+  padding: 0.5rem;
+  background: var(--portfolio-bg);
+  color: var(--portfolio-text);
+  font: inherit;
+}
+
+.form-note {
+  color: var(--portfolio-muted);
+  font-size: 0.85rem;
+}
+
+.form-error {
+  color: var(--portfolio-danger, #b3261e);
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.form-success {
+  font-weight: 600;
+}
+
+/* Honeypot field: hidden from sighted users and excluded from the tab
+   order, but still present/interactable to a naive bot that fills in every
+   field it finds - `display:none`/`visibility:hidden` fields are commonly
+   skipped by such bots, so this uses an off-screen-but-rendered technique
+   instead. Screen readers also skip it via aria-hidden on the wrapper
+   (app/templates/base/_content_components.html). */
+.contact-honeypot {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+:focus-visible {
+  outline: 2px solid var(--portfolio-accent);
+  outline-offset: 2px;
+}

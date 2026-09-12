@@ -1,0 +1,10 @@
+{% extends "themes/_layout.html" %}
+{% import "base/_content_components.html" as content %}
+{% block content %}
+<div class="container theme-minimal-shell">
+  <p class="terminal-prompt" aria-hidden="true">visitor@portfolio:~$ whoami</p>
+  {{ content.portfolio_hero(profile) }}
+  <p class="terminal-prompt" aria-hidden="true">visitor@portfolio:~$ cat experience.log</p>
+  {{ content.experience_list(experiences) }}
+</div>
+{% endblock %}

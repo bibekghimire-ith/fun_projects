@@ -1,0 +1,58 @@
+/* Academic / Research theme: serif, citation/publication-list styling. */
+
+.theme-academic {
+  --portfolio-font-body: "Georgia", "Iowan Old Style", "Palatino Linotype", serif;
+  --portfolio-font-heading: var(--portfolio-font-body);
+  --portfolio-accent: #7a3b12;
+  --portfolio-radius: 0.05rem;
+
+  --portfolio-bg: #fbf8f2;
+  --portfolio-surface: #f2ece0;
+  --portfolio-text: #241f18;
+  --portfolio-muted: #6b6152;
+  --portfolio-border: #ded2bb;
+}
+
+html[data-bs-theme="dark"] .theme-academic {
+  --portfolio-bg: #1b1712;
+  --portfolio-surface: #241f18;
+  --portfolio-text: #eee6d6;
+  --portfolio-muted: #b3a68c;
+  --portfolio-border: #3a3226;
+  --portfolio-accent: #d59a5c;
+}
+
+.theme-academic-shell {
+  max-width: 760px;
+  padding: 2rem 0 3rem;
+}
+
+.theme-academic .document-kicker {
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-size: 0.75rem;
+  border-bottom: 1px solid var(--portfolio-border);
+  padding-bottom: 0.4rem;
+  margin: 2rem 0 0.5rem;
+  color: var(--portfolio-muted);
+}
+
+.theme-academic .experience-list {
+  gap: 1rem;
+}
+
+.theme-academic .experience-item {
+  border-left: none;
+  border-bottom: 1px dotted var(--portfolio-border);
+  padding: 0 0 0.75rem;
+}
+
+.theme-academic .experience-role-name::after {
+  content: ",";
+}
+
+.theme-academic h1,
+.theme-academic h2 {
+  font-weight: 400;
+  font-variant: small-caps;
+}

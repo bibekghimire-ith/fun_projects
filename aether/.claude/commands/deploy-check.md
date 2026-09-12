@@ -1,0 +1,1 @@
+Verify Docker builds, env docs, migrations, health checks, secret hygiene, secure defaults, backup guidance, logs and production readiness.

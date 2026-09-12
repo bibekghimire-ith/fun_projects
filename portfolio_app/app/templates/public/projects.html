@@ -1,0 +1,12 @@
+{% extends "themes/_layout.html" %}
+{% import "base/_content_components.html" as content %}
+{% block content %}
+<div class="container theme-{{ theme.key }}-shell">
+  <h1 class="visually-hidden">Projects</h1>
+  {% if profile %}
+    {{ content.project_grid(profile.projects) }}
+  {% else %}
+    <p class="empty-state">No projects have been published yet.</p>
+  {% endif %}
+</div>
+{% endblock %}

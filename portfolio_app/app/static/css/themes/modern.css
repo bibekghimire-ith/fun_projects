@@ -1,0 +1,51 @@
+/* Modern Professional theme: clean corporate, light-by-default. */
+
+.theme-modern {
+  --portfolio-font-body: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --portfolio-font-heading: var(--portfolio-font-body);
+  --portfolio-accent: #0b5ed7;
+  --portfolio-radius: 0.75rem;
+
+  --portfolio-bg: #f7f9fc;
+  --portfolio-surface: #ffffff;
+  --portfolio-text: #1c2530;
+  --portfolio-muted: #5b6674;
+  --portfolio-border: #e1e6ee;
+}
+
+html[data-bs-theme="dark"] .theme-modern {
+  --portfolio-bg: #12161d;
+  --portfolio-surface: #1a2029;
+  --portfolio-text: #eef1f6;
+  --portfolio-muted: #a2acbb;
+  --portfolio-border: #2a3140;
+  --portfolio-accent: #6ea8fe;
+}
+
+.theme-modern-shell {
+  max-width: 860px;
+  padding: 2rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.theme-modern .modern-card {
+  background: var(--portfolio-surface);
+  border: 1px solid var(--portfolio-border);
+  border-radius: var(--portfolio-radius);
+  padding: 1.75rem;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+}
+
+.theme-modern .section-eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+  color: var(--portfolio-accent);
+  font-weight: 600;
+}
+
+.theme-modern .experience-item {
+  border-left-color: var(--portfolio-accent);
+}

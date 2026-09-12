@@ -1,0 +1,15 @@
+{% extends "admin/layout.html" %}
+{% block title %}{{ "Edit" if experience else "New" }} Experience{% endblock %}
+{% block content %}
+<h1>&gt; {{ "edit" if experience else "new" }} experience_</h1>
+<form method="post" action="{{ '/admin/experience/%d/edit' % experience.id if experience else '/admin/experience/new' }}" class="form">
+  <label>role<input type="text" name="role" value="{{ experience.role if experience else '' }}" required></label>
+  <label>company<input type="text" name="company" value="{{ experience.company if experience else '' }}" required></label>
+  <label>location<input type="text" name="location" value="{{ experience.location if experience else '' }}"></label>
+  <label>start date<input type="date" name="start_date" value="{{ experience.start_date if experience else '' }}" required></label>
+  <label>end date (blank = present)<input type="date" name="end_date" value="{{ experience.end_date if experience and experience.end_date else '' }}"></label>
+  <label>description<textarea name="description" rows="5">{{ experience.description if experience else '' }}</textarea></label>
+  <label>order index<input type="number" name="order_index" value="{{ experience.order_index if experience else 0 }}"></label>
+  <button class="btn" type="submit">save</button>
+</form>
+{% endblock %}

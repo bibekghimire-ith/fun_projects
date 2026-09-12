@@ -1,0 +1,105 @@
+/* Theme-neutral structural rules for the blog (Phase 5), following the same
+   pattern app/static/css/base.css already uses for the rest of the public
+   site: only layout/spacing here, colors come from each theme's own CSS
+   custom properties (app/static/css/themes/<key>.css) so a blog post looks
+   themed like the rest of the site with no theme-specific duplication. */
+
+.blog-post-list {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+}
+
+.blog-post-card-image,
+.blog-post-cover-image {
+  max-width: 100%;
+  border-radius: var(--portfolio-radius, 4px);
+}
+
+.blog-post-meta {
+  color: var(--portfolio-muted, #666);
+  font-size: 0.9rem;
+}
+
+.blog-tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  list-style: none;
+  padding: 0;
+  margin: 0.25rem 0 1rem;
+}
+
+.blog-tag-list li {
+  border: 1px solid var(--portfolio-border, #ccc);
+  border-radius: 999px;
+  padding: 0.1rem 0.6rem;
+  font-size: 0.8rem;
+}
+
+.blog-featured-badge {
+  font-weight: bold;
+}
+
+.blog-post-body,
+.blog-preview-pane {
+  line-height: 1.6;
+}
+
+.blog-post-body pre,
+.blog-preview-pane pre {
+  overflow-x: auto;
+  padding: 1rem;
+  border-radius: var(--portfolio-radius, 4px);
+}
+
+.blog-post-body img,
+.blog-preview-pane img {
+  max-width: 100%;
+}
+
+/* Phase 6: discovery/SEO structural additions - same theme-neutral
+   layout-only approach, colors still come from each theme's CSS custom
+   properties. */
+
+.blog-reading-time {
+  color: var(--portfolio-muted, #666);
+  font-size: 0.85rem;
+  margin: 0.25rem 0;
+}
+
+.blog-search-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.blog-search-form label {
+  display: block;
+  font-size: 0.85rem;
+}
+
+.blog-pagination ul {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  list-style: none;
+  padding: 0;
+  margin: 2rem 0;
+  gap: 1rem;
+}
+
+.blog-pagination-status {
+  color: var(--portfolio-muted, #666);
+  font-size: 0.9rem;
+  text-align: center;
+  flex: 1;
+}
+
+.related-posts-section {
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--portfolio-border, #ccc);
+}

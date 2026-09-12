@@ -1,0 +1,1 @@
+Determine the next incomplete implementation phase. Implement one vertical slice, run tests/lint/type checks/security checks, update docs and report remaining risks.

@@ -1,0 +1,15 @@
+/*
+Minimal admin CMS stylesheet.
+
+The admin CMS (app/templates/base/layout.html and everything that extends
+it) previously had no stylesheet at all, so a handful of action forms used
+an inline `style="display:inline"` attribute to sit next to each other in a
+table row instead of stacking as block-level forms. Phase 8's
+Content-Security-Policy (app/common/security_headers.py) forbids inline
+style attributes without 'unsafe-inline', so those attributes were replaced
+with this one utility class - see docs/DECISIONS.md.
+*/
+
+.d-inline {
+  display: inline;
+}

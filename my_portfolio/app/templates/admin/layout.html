@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="retro-green">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — {% block title %}Dashboard{% endblock %}</title>
+  <link rel="stylesheet" href="/static/css/retro.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav-inner">
+      <a class="brand" href="/admin">admin_</a>
+      <nav>
+        <a href="/admin">dashboard</a>
+        <a href="/admin/settings">site settings</a>
+        <a href="/admin/projects">projects</a>
+        <a href="/admin/skills">skills</a>
+        <a href="/admin/experience">experience</a>
+        <a href="/admin/change-password">change password</a>
+        <a href="/" target="_blank">view site &gt;</a>
+        <form method="post" action="/admin/logout" style="display:inline">
+          <button class="link-btn" type="submit">logout</button>
+        </form>
+      </nav>
+    </div>
+  </header>
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

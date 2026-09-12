@@ -1,0 +1,19 @@
+{% extends "admin/layout.html" %}
+{% block title %}{{ "Edit" if project else "New" }} Project{% endblock %}
+{% block content %}
+<h1>&gt; {{ "edit" if project else "new" }} project_</h1>
+<form method="post" action="{{ '/admin/projects/%d/edit' % project.id if project else '/admin/projects/new' }}" class="form" enctype="multipart/form-data">
+  <label>title<input type="text" name="title" value="{{ project.title if project else '' }}" required></label>
+  <label>summary (short, shown in cards)<input type="text" name="summary" value="{{ project.summary if project else '' }}"></label>
+  <label>description (full, shown on detail page)<textarea name="description" rows="6">{{ project.description if project else '' }}</textarea></label>
+  <label>tech stack (comma-separated)<input type="text" name="tech_stack" value="{{ project.tech_stack if project else '' }}"></label>
+  <label>repo url<input type="text" name="repo_url" value="{{ project.repo_url if project else '' }}"></label>
+  <label>live url<input type="text" name="live_url" value="{{ project.live_url if project else '' }}"></label>
+  <label>image url<input type="text" name="image_url" value="{{ project.image_url if project else '' }}"></label>
+  {% if project and project.image_url %}<img src="{{ project.image_url }}" alt="current image" style="max-width:160px;border:1px solid var(--border);">{% endif %}
+  <label>or upload image (png/jpg/gif/webp/svg, max 5MB — overrides the URL above)<input type="file" name="image_file" accept="image/*"></label>
+  <label class="checkbox"><input type="checkbox" name="featured" value="true" {{ "checked" if project and project.featured else "" }}> featured on homepage</label>
+  <label>order index<input type="number" name="order_index" value="{{ project.order_index if project else 0 }}"></label>
+  <button class="btn" type="submit">save</button>
+</form>
+{% endblock %}

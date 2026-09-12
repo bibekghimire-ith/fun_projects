@@ -1,0 +1,35 @@
+{% extends "base/layout.html" %}
+{% block title %}{{ heading }}{% endblock %}
+{% block content %}
+<main>
+  {% include "admin/_nav.html" %}
+  <h1>{{ heading }}</h1>
+  <p>Choose which built-in visual template is active on the public site. Switching
+     the active template only changes presentation - your profile, experience,
+     and other portfolio content are never modified.</p>
+  <ul class="template-list">
+    {% for template in templates %}
+      <li class="template-item">
+        <h2>
+          {{ template.name }}
+          {% if template.is_active %}<span class="badge-active">Active</span>{% endif %}
+        </h2>
+        <p>{{ template.description }}</p>
+        <p>
+          <a href="{{ url_for('admin.templates_preview', key=template.key) }}">Preview</a>
+          {% if not template.is_active %}
+            <form
+              method="post"
+              action="{{ url_for('admin.templates_activate', key=template.key) }}"
+              class="d-inline"
+            >
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit">Set as active</button>
+            </form>
+          {% endif %}
+        </p>
+      </li>
+    {% endfor %}
+  </ul>
+</main>
+{% endblock %}

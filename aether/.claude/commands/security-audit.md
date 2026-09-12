@@ -1,0 +1,1 @@
+Audit auth, authorization, tool policy, shell, filesystem, SSRF/browser, Docker, SSH, DB, credentials, prompt injection, secrets and cross-user isolation. Provide severity, scenario, impact, remediation and test.

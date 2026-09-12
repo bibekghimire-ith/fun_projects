@@ -1,0 +1,61 @@
+{% extends "admin/layout.html" %}
+{% block title %}Experience{% endblock %}
+{% block content %}
+<h1>&gt; experience &amp; education_</h1>
+
+<section class="panel">
+  <h2>experience <a class="btn" href="/admin/experience/new">+ new</a></h2>
+  <table class="admin-table">
+    <thead><tr><th>role</th><th>company</th><th>dates</th><th></th></tr></thead>
+    <tbody>
+      {% for exp in experiences %}
+      <tr>
+        <td><a href="/admin/experience/{{ exp.id }}/edit">{{ exp.role }}</a></td>
+        <td>{{ exp.company }}</td>
+        <td>{{ exp.start_date }} — {{ exp.end_date if exp.end_date else "present" }}</td>
+        <td>
+          <form method="post" action="/admin/experience/{{ exp.id }}/delete" onsubmit="return confirm('Delete this entry?');" style="display:inline">
+            <button class="link-btn" type="submit">delete</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="4">No experience entries yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+<section class="panel">
+  <h2>education</h2>
+  <table class="admin-table">
+    <thead><tr><th>institution</th><th>degree</th><th>dates</th><th></th></tr></thead>
+    <tbody>
+      {% for edu in education %}
+      <tr>
+        <td>{{ edu.institution }}</td>
+        <td>{{ edu.degree }}{% if edu.field %} in {{ edu.field }}{% endif %}</td>
+        <td>{{ edu.start_date if edu.start_date else "" }} — {{ edu.end_date if edu.end_date else "present" }}</td>
+        <td>
+          <form method="post" action="/admin/education/{{ edu.id }}/delete" onsubmit="return confirm('Delete this entry?');" style="display:inline">
+            <button class="link-btn" type="submit">delete</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="4">No education entries yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <form method="post" action="/admin/education/new" class="form inline">
+    <label>institution<input type="text" name="institution" required></label>
+    <label>degree<input type="text" name="degree"></label>
+    <label>field<input type="text" name="field"></label>
+    <label>start date<input type="date" name="start_date"></label>
+    <label>end date<input type="date" name="end_date"></label>
+    <label>order<input type="number" name="order_index" value="0"></label>
+    <button class="btn" type="submit">add education</button>
+  </form>
+</section>
+{% endblock %}

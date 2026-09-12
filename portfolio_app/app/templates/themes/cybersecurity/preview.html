@@ -1,0 +1,14 @@
+{% extends "themes/_layout.html" %}
+{% import "base/_content_components.html" as content %}
+{% block content %}
+<div class="container theme-cybersecurity-shell">
+  <p class="scan-line" aria-hidden="true">[ SCANNING TARGET PROFILE ]</p>
+  <div class="hud-panel">
+    {{ content.portfolio_hero(profile) }}
+  </div>
+  <p class="scan-line" aria-hidden="true">[ OPERATION LOG ]</p>
+  <div class="hud-panel">
+    {{ content.experience_list(experiences) }}
+  </div>
+</div>
+{% endblock %}

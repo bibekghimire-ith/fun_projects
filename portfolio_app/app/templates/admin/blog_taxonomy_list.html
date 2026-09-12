@@ -1,0 +1,42 @@
+{#
+Small dedicated list template for BlogCategory/BlogTag - like
+app/templates/admin/entity_list.html but without the "visible"/move-up/
+move-down columns, since neither model has OrderingMixin/VisibilityMixin
+(docs/DATABASE_DESIGN.md's BlogCategory/BlogTag carry no display_order or
+visible column - see docs/DECISIONS.md).
+#}
+{% extends "base/layout.html" %}
+{% block title %}{{ heading }}{% endblock %}
+{% block content %}
+<main>
+  {% include "admin/_nav.html" %}
+  <h1>{{ heading }}</h1>
+  <p><a href="{{ new_url }}">Add new</a></p>
+  <table>
+    <caption class="visually-hidden">{{ heading }}</caption>
+    <thead>
+      <tr>
+        {% for label in column_labels %}<th scope="col">{{ label }}</th>{% endfor %}
+        <th scope="col">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+      <tr>
+        {% for value in row.columns %}<td>{{ value }}</td>{% endfor %}
+        <td>
+          <a href="{{ row.edit_url }}">Edit</a>
+          <form method="post" action="{{ row.delete_url }}" class="d-inline" data-confirm='Delete this item? This cannot be undone.'
+                >
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" aria-label="Delete {{ row.label }}">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="{{ column_labels|length + 1 }}">No items yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</main>
+{% endblock %}

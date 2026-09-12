@@ -1,0 +1,25 @@
+{#
+Full-page admin preview of a blog post, including drafts - reuses the exact
+same public blog-detail structure/macros (app/templates/base/
+_content_components.html) so what the admin sees here matches what will be
+rendered publicly once the post is visible, rather than a bespoke unstyled
+preview.
+#}
+{% extends "base/layout.html" %}
+{% block title %}{{ heading }}{% endblock %}
+{% block extra_head %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/blog.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/pygments.css') }}">
+{% endblock %}
+{% block content %}
+<main>
+  {% include "admin/_nav.html" %}
+  <p><a href="{{ url_for('admin.blog_edit', entity_id=post.id) }}">Back to edit</a></p>
+  <article>
+    <h1>{{ post.title }}</h1>
+    <p>Status: {{ post.status }}</p>
+    {% if post.excerpt %}<p><em>{{ post.excerpt }}</em></p>{% endif %}
+    <div class="blog-preview-pane">{{ post.rendered_body | safe }}</div>
+  </article>
+</main>
+{% endblock %}

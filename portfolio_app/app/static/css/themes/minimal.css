@@ -1,0 +1,51 @@
+/* Minimal Developer theme: monospace, terminal-inspired, dark-by-default. */
+
+.theme-minimal {
+  --portfolio-font-body: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  --portfolio-font-heading: var(--portfolio-font-body);
+  --portfolio-accent: #3ddc84;
+  --portfolio-radius: 0.15rem;
+
+  /* This theme's natural identity is dark; these are its baseline colors,
+     applied regardless of the light/dark toggle unless overridden below. */
+  --portfolio-bg: #0d0f12;
+  --portfolio-surface: #14171b;
+  --portfolio-text: #d7f9e5;
+  --portfolio-muted: #7c8a82;
+  --portfolio-border: #263029;
+}
+
+/* Explicit light-mode toggle: swap to a light terminal palette instead of
+   the theme's dark default. */
+html[data-bs-theme="light"] .theme-minimal {
+  --portfolio-bg: #f4f7f4;
+  --portfolio-surface: #e7ede8;
+  --portfolio-text: #10241a;
+  --portfolio-muted: #4b5b52;
+  --portfolio-border: #c3d2c7;
+  --portfolio-accent: #1f8f52;
+}
+
+.theme-minimal .terminal-prompt {
+  color: var(--portfolio-accent);
+  margin: 1.5rem 0 0.25rem;
+}
+
+.theme-minimal-shell {
+  max-width: 780px;
+  padding-top: 1rem;
+  padding-bottom: 2rem;
+}
+
+.theme-minimal .hero-name,
+.theme-minimal h2 {
+  letter-spacing: -0.02em;
+}
+
+.theme-minimal .experience-item {
+  border-left-style: dashed;
+}
+
+.theme-minimal .skill-badge {
+  border-radius: 0;
+}

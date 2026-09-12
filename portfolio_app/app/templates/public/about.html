@@ -1,0 +1,17 @@
+{% extends "themes/_layout.html" %}
+{% import "base/_content_components.html" as content %}
+{% block content %}
+<div class="container theme-{{ theme.key }}-shell">
+  {% if profile %}
+    {{ content.portfolio_hero(profile) }}
+    {% if profile.educations %}
+      {{ content.education_list(profile.educations) }}
+    {% endif %}
+  {% else %}
+    <section class="empty-state-section" aria-labelledby="about-empty-heading">
+      <h1 id="about-empty-heading">About</h1>
+      <p class="empty-state">No profile information has been published yet.</p>
+    </section>
+  {% endif %}
+</div>
+{% endblock %}

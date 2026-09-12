@@ -1,0 +1,41 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-portfolio}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-portfolio}
+      POSTGRES_DB: ${POSTGRES_DB:-portfolio}
+    volumes:
+      - portfolio_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-portfolio}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  web:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SECRET_KEY: ${SECRET_KEY:-change-this-to-a-long-random-string}
+      # "production" makes the admin session cookie HTTPS-only. Only set this
+      # to production once the app is served over HTTPS (e.g. behind a
+      # TLS-terminating reverse proxy) — otherwise the admin login cookie
+      # will silently never be sent back and login will appear to fail.
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+      SITE_NAME: ${SITE_NAME:-My Portfolio}
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-change-this-password}
+      DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER:-portfolio}:${POSTGRES_PASSWORD:-portfolio}@db:5432/${POSTGRES_DB:-portfolio}
+    ports:
+      - "8000:8000"
+    volumes:
+      - portfolio_uploads:/app/app/static/uploads
+
+volumes:
+  portfolio_db_data:
+  portfolio_uploads:

@@ -1,0 +1,14 @@
+{% extends "base/layout.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+<main class="dashboard">
+  {% include "admin/_nav.html" %}
+  <h1>Admin Dashboard</h1>
+  <p>Signed in as {{ user.email }}.</p>
+  <p>Manage your portfolio content using the sections above.</p>
+  <form method="post" action="{{ url_for('auth.logout') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="submit">Log out</button>
+  </form>
+</main>
+{% endblock %}

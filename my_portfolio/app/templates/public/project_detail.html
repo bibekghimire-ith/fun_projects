@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}{{ project.title }} — {{ site.site_title }}{% endblock %}
+{% block content %}
+<section class="panel">
+  <a class="link" href="/projects">&lt; back to projects</a>
+  <h2>{{ project.title }}</h2>
+  {% if project.image_url %}<img class="project-image" src="{{ project.image_url }}" alt="{{ project.title }}">{% endif %}
+  <p>{{ project.description }}</p>
+  <div class="tags">
+    {% for tech in project.tech_list %}<span class="tag">{{ tech }}</span>{% endfor %}
+  </div>
+  <div class="project-links">
+    {% if project.repo_url %}<a class="btn" href="{{ project.repo_url }}" target="_blank" rel="noopener">source</a>{% endif %}
+    {% if project.live_url %}<a class="btn" href="{{ project.live_url }}" target="_blank" rel="noopener">live demo</a>{% endif %}
+  </div>
+</section>
+{% endblock %}
