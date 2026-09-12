@@ -17,6 +17,7 @@ from sqlalchemy import (
     Integer,
     String,
     Text,
+    UniqueConstraint,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -137,3 +138,48 @@ class Education(Base):
     start_date: Mapped[date | None] = mapped_column(Date, nullable=True)
     end_date: Mapped[date | None] = mapped_column(Date, nullable=True)
     order_index: Mapped[int] = mapped_column(Integer, default=0)
+
+
+class Post(Base):
+    """A blog post. `content_markdown` is the source of truth (edited in
+    /admin); `content_html` is the sanitized HTML rendered from it at save
+    time — see app/markdown_utils.py. Public routes only ever read
+    `content_html`, never re-render Markdown on the request path.
+    """
+
+    __tablename__ = "posts"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    title: Mapped[str] = mapped_column(String(200), nullable=False)
+    slug: Mapped[str] = mapped_column(String(220), unique=True, nullable=False, index=True)
+    summary: Mapped[str] = mapped_column(String(300), default="")
+    content_markdown: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    content_html: Mapped[str] = mapped_column(Text, default="")
+    cover_image_url: Mapped[str] = mapped_column(String(500), default="")
+    tags: Mapped[str] = mapped_column(String(300), default="")  # comma-separated, same pattern as Project.tech_stack
+    published: Mapped[bool] = mapped_column(Boolean, default=False)
+    published_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+    view_count: Mapped[int] = mapped_column(Integer, default=0)
+    order_index: Mapped[int] = mapped_column(Integer, default=0)
+
+    @property
+    def tag_list(self) -> list[str]:
+        return [t.strip() for t in self.tags.split(",") if t.strip()]
+
+
+class PostView(Base):
+    """One row per (post, UTC calendar day) — enough for a views-over-time
+    chart without ever storing anything that identifies a visitor (no IP,
+    no cookie, no user agent). See BLOG_PLAN.md section 3 for the reasoning.
+    """
+
+    __tablename__ = "post_views"
+    __table_args__ = (UniqueConstraint("post_id", "day", name="uq_post_views_post_day"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    post_id: Mapped[int] = mapped_column(ForeignKey("posts.id"), nullable=False)
+    day: Mapped[date] = mapped_column(Date, nullable=False)
+    count: Mapped[int] = mapped_column(Integer, default=0)

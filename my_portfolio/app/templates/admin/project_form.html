@@ -3,6 +3,7 @@
 {% block content %}
 <h1>&gt; {{ "edit" if project else "new" }} project_</h1>
 <form method="post" action="{{ '/admin/projects/%d/edit' % project.id if project else '/admin/projects/new' }}" class="form" enctype="multipart/form-data">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
   <label>title<input type="text" name="title" value="{{ project.title if project else '' }}" required></label>
   <label>summary (short, shown in cards)<input type="text" name="summary" value="{{ project.summary if project else '' }}"></label>
   <label>description (full, shown on detail page)<textarea name="description" rows="6">{{ project.description if project else '' }}</textarea></label>

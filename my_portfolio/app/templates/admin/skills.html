@@ -6,6 +6,7 @@
 <section class="panel">
   <h2>add category</h2>
   <form method="post" action="/admin/skills/categories/new" class="form inline">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
     <label>name<input type="text" name="name" required></label>
     <label>order<input type="number" name="order_index" value="0"></label>
     <button class="btn" type="submit">add category</button>
@@ -16,6 +17,7 @@
 <section class="panel">
   <h2>{{ category.name }}
     <form method="post" action="/admin/skills/categories/{{ category.id }}/delete" onsubmit="return confirm('Delete category and all its skills?');" style="display:inline">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
       <button class="link-btn" type="submit">[delete category]</button>
     </form>
   </h2>
@@ -30,6 +32,7 @@
         <td>{{ skill.order_index }}</td>
         <td>
           <form method="post" action="/admin/skills/{{ skill.id }}/delete" onsubmit="return confirm('Delete this skill?');" style="display:inline">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
             <button class="link-btn" type="submit">delete</button>
           </form>
         </td>
@@ -41,6 +44,7 @@
   </table>
 
   <form method="post" action="/admin/skills/new" class="form inline">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
     <input type="hidden" name="category_id" value="{{ category.id }}">
     <label>name<input type="text" name="name" required></label>
     <label>level (0-100)<input type="number" name="level" value="80" min="0" max="100"></label>

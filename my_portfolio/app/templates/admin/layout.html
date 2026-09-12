@@ -16,9 +16,12 @@
         <a href="/admin/projects">projects</a>
         <a href="/admin/skills">skills</a>
         <a href="/admin/experience">experience</a>
+        <a href="/admin/posts">posts</a>
+        <a href="/admin/analytics">analytics</a>
         <a href="/admin/change-password">change password</a>
         <a href="/" target="_blank">view site &gt;</a>
         <form method="post" action="/admin/logout" style="display:inline">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
           <button class="link-btn" type="submit">logout</button>
         </form>
       </nav>

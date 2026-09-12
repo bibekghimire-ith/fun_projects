@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}{{ post.title }} — {{ site.site_title }}{% endblock %}
+{% block content %}
+<section class="panel">
+  <a class="link" href="/blog">&lt; back to blog</a>
+  <h2>{{ post.title }}</h2>
+  <p class="meta">
+    {{ post.published_at.strftime('%Y-%m-%d') if post.published_at else "" }}
+    &middot; {{ post.view_count }} view{{ "s" if post.view_count != 1 else "" }}
+  </p>
+  {% if post.cover_image_url %}<img class="project-image" src="{{ post.cover_image_url }}" alt="{{ post.title }}">{% endif %}
+  <div class="tags">
+    {% for tag in post.tag_list %}<span class="tag">{{ tag }}</span>{% endfor %}
+  </div>
+  <div class="prose">
+    {{ post.content_html | safe }}
+  </div>
+</section>
+{% endblock %}

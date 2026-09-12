@@ -1,21 +1,47 @@
 /* Minimal retro theme. --bg / --fg / --accent are swappable from the admin
-   panel (Site Settings); --bg-panel / --border / --fg-dim are normally
-   *derived* from those three at render time via color-mix() (see the
-   inline <style> in base.html) so the whole theme stays coherent no
-   matter what colors are chosen. The static values below are just the
+   panel (Site Settings); --bg-panel / --border / --fg-dim / --accent-ink
+   are normally *derived* from those three at render time via color-mix()
+   (see the inline <style> in base.html) so the whole theme stays coherent
+   no matter what colors are chosen. The static values below are just the
    fallback for a browser without color-mix() support, and what admin-only
    pages (login, dashboard, etc.) use as-is since those don't take
    per-site colors.
 
    Defaults mirror https://www.causehouse.co (Awwwards-featured): cream
-   background, dark green-black text, lime accent. */
+   background, dark green-black text, lime accent.
+
+   Accent is used two ways, and it matters which: raw --accent is a large
+   FILL (button backgrounds, the skill-meter track's filled portion is
+   actually --accent-ink now — see below, decorative borders) where
+   whatever sits on top carries the contrast requirement; --accent-ink is
+   a darker, readable blend of --accent into --fg, used everywhere accent
+   appears as TEXT or a text-adjacent border (headings, links, success
+   messages, status pills, meter fill, focus rings). The raw accent color
+   was picked to look good as a bright highlight, not as body text — on
+   the shipped lime-on-cream default, raw accent text is only ~1.2:1
+   contrast against the background (functionally invisible for anyone
+   with even mild low vision); --accent-ink is ~5:1, comfortably above the
+   WCAG AA 4.5:1 threshold for normal text. If you customize the palette
+   in Site Settings, sanity-check --accent-ink's derived contrast too —
+   there's no automatic contrast checker (see ADMIN_README.md). */
 :root {
   --bg: #F7F0E6;
   --bg-panel: #F3EBDD;
   --fg: #1D2B1F;
   --fg-dim: #5b6b5e;
   --accent: #BFEA4B;
+  /* Readable version of --accent for text/borders (see base.html for the
+     color-mix() derivation and rationale) — raw accent on --bg is ~1.2:1
+     contrast, this fallback is the pre-computed equivalent for browsers
+     without color-mix() and for admin-only pages that don't load
+     base.html's inline theme (login, dashboard, etc). */
+  --accent-ink: #566E2E;
   --border: #E4DAC8;
+  /* Fixed semantic color for validation errors — intentionally NOT
+     derived from the site's accent/fg/bg, since it needs to read as "an
+     error" regardless of the chosen theme, and reliably contrasts
+     (~5.8:1) against the default light background. */
+  --error: #B3261E;
   --font-mono: "Courier New", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
 }
 
@@ -31,7 +57,7 @@ body {
 
 .container { max-width: 860px; margin: 0 auto; padding: 0 20px; }
 
-a { color: var(--accent); text-decoration: none; }
+a { color: var(--accent-ink); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
 .site-header {
@@ -45,12 +71,12 @@ nav a:first-child { margin-left: 0; }
 
 .hero { padding: 48px 0 24px; }
 .hero .avatar { width: 96px; height: 96px; border-radius: 4px; border: 1px solid var(--accent); margin-bottom: 16px; }
-h1.glitch { font-size: 2.2rem; margin: 0 0 8px; color: var(--accent); }
+h1.glitch { font-size: 2.2rem; margin: 0 0 8px; color: var(--accent-ink); }
 .tagline { color: var(--fg-dim); margin: 0 0 16px; }
 .bio { max-width: 640px; }
 
 .panel { padding: 24px 0; border-top: 1px solid var(--border); }
-.panel h2 { color: var(--accent); font-size: 1.1rem; text-transform: lowercase; }
+.panel h2 { color: var(--accent-ink); font-size: 1.1rem; text-transform: lowercase; }
 
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; margin-top: 16px; }
 .card {
@@ -60,8 +86,8 @@ h1.glitch { font-size: 2.2rem; margin: 0 0 8px; color: var(--accent); }
   padding: 16px;
   color: var(--fg);
 }
-.card:hover { border-color: var(--accent); text-decoration: none; }
-.card h3 { margin: 0 0 8px; color: var(--accent); }
+.card:hover { border-color: var(--accent-ink); text-decoration: none; }
+.card h3 { margin: 0 0 8px; color: var(--accent-ink); }
 .card-image {
   display: block;
   width: 100%;
@@ -90,19 +116,25 @@ h1.glitch { font-size: 2.2rem; margin: 0 0 8px; color: var(--accent); }
 .skill-row { display: flex; align-items: center; gap: 12px; margin: 6px 0; }
 .skill-name { width: 140px; flex-shrink: 0; }
 .meter { flex: 1; height: 10px; background: var(--bg-panel); border: 1px solid var(--border); }
-.meter-fill { height: 100%; background: var(--accent); }
+.meter-fill { height: 100%; background: var(--accent-ink); }
 
 .btn {
   display: inline-block;
   border: 1px solid var(--accent);
-  color: var(--accent);
+  color: var(--fg);
   padding: 8px 14px;
   margin-top: 8px;
   cursor: pointer;
-  background: transparent;
+  background: var(--accent);
   font-family: inherit;
+  font-weight: bold;
 }
-.btn:hover { background: var(--accent); color: var(--bg); text-decoration: none; }
+/* Filled by default (readable: --fg on --accent is a high-contrast pair
+   for any reasonable theme) rather than the previous accent-on-transparent
+   outline, which was only ~1.2:1 against --bg with the default palette and
+   effectively invisible. Hover inverts to an outline in --accent-ink,
+   which is legible against --bg too. */
+.btn:hover { background: transparent; color: var(--accent-ink); border-color: var(--accent-ink); text-decoration: none; }
 
 .link-btn {
   background: none;
@@ -113,14 +145,14 @@ h1.glitch { font-size: 2.2rem; margin: 0 0 8px; color: var(--accent); }
   font-family: inherit;
   padding: 0;
 }
-.link-btn:hover { color: var(--accent); }
+.link-btn:hover { color: var(--accent-ink); }
 
 .contact-list { list-style: none; padding: 0; }
 .contact-list li { margin: 4px 0; }
 
 .timeline { list-style: none; padding: 0; }
 .timeline li { border-left: 2px solid var(--border); padding: 0 0 20px 16px; margin-bottom: 4px; }
-.timeline h3 { margin: 0 0 4px; color: var(--accent); }
+.timeline h3 { margin: 0 0 4px; color: var(--accent-ink); }
 .meta { color: var(--fg-dim); font-size: 0.9rem; margin: 0 0 8px; }
 
 .project-image { max-width: 100%; border: 1px solid var(--border); margin: 16px 0; }
@@ -141,17 +173,56 @@ input, textarea, button {
   border: 1px solid var(--border);
   padding: 8px;
 }
-input:focus, textarea:focus { outline: 1px solid var(--accent); }
+input:focus, textarea:focus { outline: 1px solid var(--accent-ink); }
 
 .login-container { padding-top: 64px; max-width: 360px; }
-.error { color: #ff5555; }
-.success { color: var(--accent); }
+.error { color: var(--error); }
+.success { color: var(--accent-ink); }
 
 .admin-table { width: 100%; border-collapse: collapse; margin: 16px 0; }
 .admin-table th, .admin-table td { text-align: left; border-bottom: 1px solid var(--border); padding: 8px; }
 .stats .card { text-align: center; }
-.stats h3 { font-size: 1.8rem; margin: 0; color: var(--accent); }
+.stats h3 { font-size: 1.8rem; margin: 0; color: var(--accent-ink); }
 
 @media (max-width: 480px) {
   .skill-name { width: 100px; }
 }
+
+/* --- blog --- */
+.pager { display: flex; justify-content: space-between; margin-top: 24px; }
+.status-pill {
+  font-size: 0.75rem;
+  border: 1px solid var(--border);
+  padding: 2px 8px;
+  text-transform: lowercase;
+}
+.status-published { color: var(--accent-ink); border-color: var(--accent-ink); }
+.status-draft { color: var(--fg-dim); }
+
+.prose { max-width: 720px; margin-top: 24px; }
+.prose h1, .prose h2, .prose h3, .prose h4 { color: var(--accent-ink); margin-top: 1.6em; }
+.prose p, .prose ul, .prose ol { line-height: 1.7; }
+.prose a { text-decoration: underline; }
+.prose blockquote {
+  margin: 16px 0;
+  padding: 4px 16px;
+  border-left: 3px solid var(--accent-ink);
+  color: var(--fg-dim);
+}
+.prose code {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  padding: 1px 5px;
+  font-size: 0.9em;
+}
+.prose pre {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  padding: 12px;
+  overflow-x: auto;
+}
+.prose pre code { background: none; border: none; padding: 0; }
+.prose table { border-collapse: collapse; width: 100%; margin: 16px 0; }
+.prose th, .prose td { border: 1px solid var(--border); padding: 6px 10px; text-align: left; }
+.prose img { max-width: 100%; border: 1px solid var(--border); }
+.prose hr { border: none; border-top: 1px solid var(--border); margin: 24px 0; }

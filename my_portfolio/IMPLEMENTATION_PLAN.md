@@ -69,21 +69,119 @@
       pytest` locally once to confirm**, since this hasn't executed the app
       end-to-end yet.
 
+## Status: implemented (blogging pass, per BLOG_PLAN.md)
+
+- [x] `Post` / `PostView` models, brand-new tables picked up automatically
+      by `Base.metadata.create_all()` (no column-migration entry needed).
+- [x] `app/markdown_utils.py`: Markdown → HTML via `python-markdown`
+      (fenced code, tables, TOC, codehilite), sanitized with `nh3` against
+      an explicit tag/attribute allowlist — rendered once at save time,
+      never on the public request path.
+- [x] Admin CRUD for posts (`/admin/posts`, new/edit/delete/toggle-publish)
+      with inline validation errors that preserve submitted input, mirroring
+      the existing Project form pattern.
+- [x] Public blog (`app/routers/blog.py`): `/blog` (paginated list, published
+      only), `/blog/{slug}` (404 for missing/unpublished, increments the
+      view counter), `/blog/rss.xml` (RSS 2.0 feed).
+- [x] Privacy-preserving analytics: a `PostView` row per post per UTC day
+      (`day`, `count` only — no IP, cookie, fingerprint, or referrer),
+      surfaced at `/admin/analytics` with all-time/7-day/30-day rollups.
+- [x] Field validation: title/summary/tags/content/cover-URL length limits
+      enforced server-side on every post save, with the Post form re-rendered
+      (not discarded) on failure.
+- [x] CSRF protection: `app/security.py` gained a session-bound token
+      (`get_or_create_csrf_token` / `verify_csrf_token` / `require_csrf`);
+      every state-changing admin route now requires it (`login` is the one
+      documented exception — it doesn't act on an existing session), and a
+      hidden `csrf_token` field was added to every existing admin `<form
+      method="post">`, not just the new post forms.
+- [x] Security response headers (`app/main.py` middleware):
+      `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`,
+      `Referrer-Policy: same-origin`, `Content-Security-Policy:
+      frame-ancestors 'none'` on every response.
+- [x] Retro-styled blog templates: public list/detail pages reusing the
+      existing card/tag/panel classes, cover-image thumbnails on the admin
+      posts list (`.admin-thumb`), a `.prose` style block for rendered post
+      content (headings, code blocks, blockquotes, tables), and
+      `.status-pill` published/draft indicators.
+- [x] `tests/test_smoke.py` extended: CSRF-token helper for every existing
+      POST test, a test asserting a POST without a token is rejected,
+      Markdown-sanitization tests (script tags, event handlers, `javascript:`
+      links), slug-uniqueness, unpublished-post 404, view-counter
+      incrementing, RSS well-formedness, and admin-posts auth gating.
+- [x] `README.md` / `ADMIN_README.md` updated to document the blog feature,
+      analytics, and CSRF/security-header hardening as shipped rather than
+      planned.
+- [x] Verified: all Python files compile (`py_compile`) and all 22 Jinja
+      templates parse without error. As before, a full `pytest` run against
+      live dependencies was **not** possible from this session (package
+      installs are blocked by network policy on both the linked machine and
+      the cloud sandbox) — **please run `pip install -r
+      requirements-dev.txt && pytest` locally once to confirm**, and see
+      "Not yet done" below for the one manual step this implies.
+
+## Status: implemented (default color palette finalization)
+
+- [x] **Accessibility bug found and fixed**: the shipped default palette
+      (lime accent on cream background) had raw accent-as-text at only
+      ~1.2:1 contrast against the background — nav links, section
+      headings, card titles, hero heading, "success" messages, dashboard
+      stat numbers, and skill-meter fills were all functionally invisible
+      to anyone without perfect vision, and outline-style buttons (accent
+      border + accent text on a transparent background) were barely
+      visible at all. The form-error color (`#ff5555`) was also low
+      contrast (~2.8:1).
+- [x] Introduced `--accent-ink` (`app/templates/base.html`, derived via
+      `color-mix(in srgb, var(--accent), var(--fg) 65%)`; static fallback
+      in `retro.css`): a darker blend of accent + text color used
+      wherever accent appears as TEXT or a text-adjacent border (links,
+      headings, success text, status pills, skill-meter fill, focus
+      rings, hover borders) — ~5:1 contrast by default, above the WCAG AA
+      4.5:1 threshold for normal text. Raw `--accent` is now reserved for
+      large fills where something else on top carries the contrast (the
+      button's own text, the decorative avatar ring).
+- [x] Redesigned `.btn` from an accent-outline-on-transparent style
+      (~1.2:1, barely visible) to a solid accent-filled button with `--fg`
+      text (~10.6:1 contrast for the default palette); hover inverts to an
+      `--accent-ink` outline.
+- [x] Added `--error` (`#B3261E`, ~5.8:1 against the default background) to
+      replace the previous hardcoded `#ff5555` (~2.8:1) for form error
+      text.
+- [x] Updated the Site Settings help text and `ADMIN_README.md` to explain
+      accent-ink and steer admins picking a custom palette toward
+      choosing an accent with real contrast against their background/text.
+- [x] Verified: all Python files still compile and all 22 templates still
+      parse; the CSS file's braces balance (no structural syntax check
+      tool was available without network access — see the recurring
+      caveat about `pip install` being blocked in this session).
+
 ## Not yet done / suggested next steps
 
-1. **Run the app locally** (see README) and eyeball the retro styling —
-   design is subjective and worth a manual look.
-2. **Reordering UX**: `order_index` fields exist on every content type but
+1. **Run `pytest` locally** — this is now the single most important
+   pending step. The whole CSRF-hardening and blog implementation was
+   verified only by syntax/template-parse checks (no network access to
+   install FastAPI/SQLAlchemy/etc. in this session); a real test run is
+   needed before treating this as production-ready.
+2. **Rebuild the Docker image** before deploying: this pass changed
+   `requirements.txt` (added `markdown`, `nh3`, `pygments`) and added new
+   Python modules/routes, so `docker compose build web && docker compose up
+   -d` is required — a plain restart of an already-running container will
+   not pick these up.
+3. **Reordering UX**: `order_index` fields exist on every content type but
    are edited as plain numbers. A drag-and-drop reorder widget (small bit of
    JS + a `/admin/.../reorder` endpoint) would be a nice follow-up.
-3. **Alembic migrations**: schema currently applies via
+4. **Alembic migrations**: schema currently applies via
    `Base.metadata.create_all()` at startup, which is fine while the schema is
    young. Once you start doing production data migrations, swap in Alembic.
-4. **Blogging** (explicitly out of scope now): see the "Future: blogging"
-   section in `README.md` for the intended shape of the change.
-5. **CI**: no CI pipeline was set up. A minimal GitHub Actions workflow
+5. **Validation UX scoping trade-off**: Project and Post forms re-render
+   with the submitted values and an inline error on validation failure;
+   Skill/SkillCategory/Experience/Education forms instead return a plain
+   `HTTPException(400)` (no re-render). This was a deliberate scope
+   decision to keep this pass tractable — worth revisiting if those forms
+   see heavy hand-editing.
+6. **CI**: no CI pipeline was set up. A minimal GitHub Actions workflow
    running `pytest` on push would be a natural addition once this is in git.
-6. **Secrets**: `.env.example` is committed but `.env` is git-ignored — make
+7. **Secrets**: `.env.example` is committed but `.env` is git-ignored — make
    sure to set a real `SECRET_KEY` and a strong `ADMIN_PASSWORD` before any
    real deployment; the defaults are intentionally insecure placeholders.
 

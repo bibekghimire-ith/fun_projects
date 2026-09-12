@@ -28,14 +28,36 @@ server-rendered templates. Fully dockerized.
   comes from the database via the admin panel.
 - Retro minimal theme with a swappable palette: background, text, and
   accent colors are all editable from the admin panel (Site Settings), with
-  panel backgrounds, borders, and dimmed text derived automatically from
-  those three via CSS `color-mix()` so the theme stays coherent for any
-  combination. Defaults are pulled from
+  panel backgrounds, borders, dimmed text, and a readable "ink" variant of
+  the accent color all derived automatically from those three via CSS
+  `color-mix()` so the theme stays coherent — and legible — for any
+  combination. The accent-ink derivation exists because a bright accent
+  color that looks great as a button fill is often close to unreadable as
+  plain text (the shipped default's raw accent-on-background contrast is
+  ~1.2:1); accent-ink blends the accent toward the text color to land
+  around 5:1, above the WCAG AA threshold for normal text, and is what's
+  actually used for headings, links, success messages, and status text —
+  buttons, meter fills, and focus/hover accents use the raw accent color or
+  the ink variant depending on which reads better against what's behind
+  them (see the comments in `retro.css`). Defaults are pulled from
   [causehouse.co](https://www.causehouse.co) (an Awwwards-featured site) —
   cream background `#F7F0E6`, dark green-black text `#1D2B1F`, lime accent
   `#BFEA4B`.
+- **Blog**: Markdown-authored posts with sanitized HTML output (safe against
+  `<script>`, event-handler, and `javascript:`-link injection), fenced code
+  blocks with syntax highlighting, tables, and an optional table of
+  contents. Drafts vs. published state, cover images (URL or upload), tags,
+  manual ordering, and an RSS feed at `/blog/rss.xml`.
+- **Privacy-preserving analytics**: a per-post, per-UTC-day view counter
+  (`/admin/analytics`) with 7-day/30-day rollups — no IP address, cookie,
+  fingerprint, or referrer is ever stored.
+- **Security hardening**: CSRF tokens on every state-changing admin form,
+  server-side field-length validation everywhere (with inline error +
+  preserved input on the Project and Post forms), and baseline security
+  response headers (`X-Content-Type-Options`, `X-Frame-Options`,
+  `Referrer-Policy`, `Content-Security-Policy: frame-ancestors 'none'`) on
+  every response.
 - Dockerized: `docker-compose up` gets you the app + Postgres.
-- Designed to be expandable — see "Future: blogging" below.
 
 ## Tech stack
 
@@ -55,20 +77,23 @@ app/
   config.py          Settings from environment variables / .env
   database.py         SQLAlchemy engine/session, init_db()
   models.py           SiteSettings, AdminUser, Project, SkillCategory, Skill,
-                      Experience, Education
-  security.py         Password hashing helpers
+                      Experience, Education, Post, PostView
+  security.py         Password hashing + CSRF token helpers
+  markdown_utils.py   Markdown -> sanitized HTML rendering for blog posts
   seed.py             Bootstraps the admin user + default site settings row
   deps.py             get_db, get_site_settings, require_admin
   routers/
-    public.py         Public site routes
-    admin.py           Admin auth + CRUD routes
+    public.py         Public site routes (projects, experience, home)
+    admin.py           Admin auth + CRUD routes (incl. posts, analytics)
+    blog.py             Public blog routes (list, detail, RSS)
   templates/           Jinja2 templates (public/, admin/, partials/)
   static/
-    css/retro.css      The entire visual theme
+    css/retro.css      The entire visual theme (incl. blog "prose" styles)
     js/admin.js         Placeholder for future interactivity
 tests/
   test_smoke.py        Boots the app, hits every page, checks the admin
-                        auth gate and login flow
+                        auth gate, CSRF enforcement, login flow, markdown
+                        sanitization, and blog CRUD/analytics/RSS behavior
 Dockerfile
 docker-compose.yml      app + postgres
 docker-compose.override.example.yml   optional dev override (hot reload)
@@ -139,6 +164,12 @@ Everything content-related is edited from `/admin` after logging in:
   skills with a 0–100 level shown as a retro meter bar.
 - **Experience / Education** — role/company/dates/description entries shown
   as a timeline.
+- **Blog posts** (`/admin/posts`) — title, summary, Markdown content, tags,
+  cover image (URL or upload), published/draft state, manual ordering.
+  Published posts appear at `/blog` and in the RSS feed at
+  `/blog/rss.xml`; drafts are only visible from the admin panel.
+- **Analytics** (`/admin/analytics`) — read-only: total views, and
+  7-day/30-day view rollups per post.
 
 No redeploy is needed for content changes — only for template/CSS/code
 changes.
@@ -198,15 +229,12 @@ This is a plain `ALTER TABLE`, not Alembic — see the comment above
 `_COLUMN_MIGRATIONS` in `app/database.py` if the schema grows enough to
 warrant switching to real migrations.
 
-## Future: blogging (not in current scope)
+## Blogging
 
-The codebase is deliberately structured so adding a blog later is additive,
-not a rewrite:
-
-- Add a `Post` (and optional `Tag`) model in `models.py`.
-- Add `app/routers/blog.py` (public list/detail) and extend `admin.py` with
-  Post CRUD, following the same pattern as `Project`.
-- Add `templates/public/blog_list.html` / `blog_detail.html` and
-  `templates/admin/post_form.html`, reusing `retro.css`.
-- Once the schema stabilizes, consider moving from `Base.metadata.create_all`
-  to Alembic migrations (not needed yet, but the codebase doesn't fight it).
+The blog feature described in `BLOG_PLAN.md` is implemented: Markdown
+authoring with sanitized HTML output, privacy-preserving view analytics,
+field validation, CSRF-protected admin forms, retro-styled public
+templates with cover-image thumbnails, and an RSS feed. `BLOG_PLAN.md` is
+kept as the design record — see it for the reasoning behind specific
+choices (e.g. why login is exempt from CSRF, why analytics only ever
+stores a date + a count).

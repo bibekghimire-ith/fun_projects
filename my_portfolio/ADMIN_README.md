@@ -45,6 +45,8 @@ Everything below is under `/admin` once logged in:
 | **Skills** | Skill categories (e.g. "Languages", "Data & Cloud"), each holding a list of skills with a 0–100 level shown as a retro meter bar. |
 | **Experience** | Work history entries: role, company, location, start/end dates, description. Leave end date blank for a current role. |
 | **Education** | Institution, degree, field, start/end dates. |
+| **Posts** | Blog posts: title, summary, Markdown content, tags, cover image, published/draft toggle, manual ordering. |
+| **Analytics** | Read-only view counts (all-time, last 7 days, last 30 days) per post. No visitor data (IP, cookies, fingerprints) is ever collected. |
 
 Changes take effect immediately — no restart or redeploy needed for
 content edits, only for template/CSS/code changes.
@@ -53,15 +55,27 @@ content edits, only for template/CSS/code changes.
 
 Site Settings has three color pickers: **background**, **text**, and
 **accent**. Everything else visual (card backgrounds, borders, dimmed/muted
-text) is computed automatically from those three, so you only ever need to
-touch these three fields to reskin the whole site. Save, then open the
-homepage in another tab to preview.
+text, and a readable "ink" version of the accent used for headings/links/
+status text) is computed automatically from those three, so you only ever
+need to touch these three fields to reskin the whole site. Save, then open
+the homepage in another tab to preview.
 
 The defaults (cream `#F7F0E6` background, dark green-black `#1D2B1F` text,
 lime `#BFEA4B` accent) are pulled from
-[causehouse.co](https://www.causehouse.co). If you pick a low-contrast
-background/text combination the derived shades can end up hard to read —
-there's no automatic contrast check, so eyeball it after saving.
+[causehouse.co](https://www.causehouse.co), tuned for legibility: the raw
+accent is a bright highlight meant for button fills and glows, not for
+text — reading it directly as text/headings would be close to invisible
+(~1.2:1 contrast). The site instead derives a darker "accent-ink" blend for
+anything text-like, which lands around 5:1 by default (comfortably above
+the WCAG AA 4.5:1 minimum for normal text).
+
+If you pick a custom palette, choose an accent with at least some
+contrast against your background/text choices — accent-ink is *derived*
+from whatever you pick, so an accent that's very close to your background
+color, or identical to your text color, can still end up hard to
+distinguish. There's no automatic contrast check, so eyeball the preview
+after saving, especially the headings, nav links, and the skill-level
+meter bars under Skills.
 
 ### Images, avatar, and résumé
 
@@ -72,6 +86,37 @@ images (png/jpg/jpeg/gif/webp/svg) and, for the résumé, PDF — capped at
 5MB each. Uploaded files are stored under `app/static/uploads/` (persisted
 via the `portfolio_uploads` Docker volume, so they survive container
 rebuilds).
+
+### Writing blog posts
+
+Go to **Posts** in the admin nav (`/admin/posts`) → **+ new post**. Write
+the body in Markdown — headings, **bold**/_italic_, fenced code blocks
+(with syntax highlighting), tables, and links are all supported. A `[TOC]`
+line anywhere in the content renders a table of contents from your
+headings.
+
+The Markdown is converted to HTML and sanitized when you save (not on
+every page view), so any pasted `<script>` tags, inline event handlers
+(`onerror=`, etc.), or `javascript:` links are stripped automatically —
+you don't need to trust the content you paste in.
+
+A post only appears on the public `/blog` page (and in the RSS feed at
+`/blog/rss.xml`) once **published** is checked. Uncheck it at any time to
+pull a post back to draft without deleting it — its content, tags, and
+view history are preserved. The **toggle publish** link on the posts list
+is a shortcut for the same thing.
+
+Cover images work exactly like project images: paste a URL or upload a
+file (png/jpg/jpeg/gif/webp/svg, max 5MB).
+
+### Reading blog analytics
+
+**Analytics** (`/admin/analytics`) shows total views across all posts and,
+per post, all-time / last-7-days / last-30-days view counts. This is
+intentionally minimal: a view increments a counter for that post on that
+UTC calendar day — no IP address, cookie, device fingerprint, or referrer
+is ever recorded, so there's no per-visitor data to review, export, or
+accidentally leak.
 
 ### Bulk-editing via content.yaml
 

@@ -1,0 +1,23 @@
+{% extends "admin/layout.html" %}
+{% block title %}{{ "Edit" if post else "New" }} Post{% endblock %}
+{% block content %}
+<h1>&gt; {{ "edit" if post else "new" }} post_</h1>
+{% if error %}<p class="error">{{ error }}</p>{% endif %}
+<form method="post" action="{{ '/admin/posts/%d/edit' % post.id if post else '/admin/posts/new' }}" class="form" enctype="multipart/form-data">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <label>title<input type="text" name="title" value="{{ post.title if post else '' }}" required maxlength="200"></label>
+  <label>summary (short, shown in list &amp; RSS — max 300 chars)<input type="text" name="summary" value="{{ post.summary if post else '' }}" maxlength="300"></label>
+  <label>content (Markdown — max 200,000 chars)<textarea name="content_markdown" rows="18" required>{{ post.content_markdown if post else '' }}</textarea></label>
+  <p class="meta">Fenced code blocks, tables, and a table of contents (via
+    <code>[TOC]</code>) are supported. The rendered HTML is sanitized on
+    save, so scripts, inline event handlers, and disallowed tags are
+    always stripped before publishing.</p>
+  <label>tags (comma-separated, max 300 chars)<input type="text" name="tags" value="{{ post.tags if post else '' }}" maxlength="300"></label>
+  <label>cover image url<input type="text" name="cover_image_url" value="{{ post.cover_image_url if post else '' }}" maxlength="500"></label>
+  {% if post and post.cover_image_url %}<img class="admin-thumb" src="{{ post.cover_image_url }}" alt="current cover" style="width:96px;height:96px;">{% endif %}
+  <label>or upload cover image (png/jpg/gif/webp/svg, max 5MB — overrides the URL above)<input type="file" name="cover_image_file" accept="image/*"></label>
+  <label class="checkbox"><input type="checkbox" name="published" value="true" {{ "checked" if post and post.published else "" }}> published</label>
+  <label>order index<input type="number" name="order_index" value="{{ post.order_index if post else 0 }}"></label>
+  <button class="btn" type="submit">save</button>
+</form>
+{% endblock %}

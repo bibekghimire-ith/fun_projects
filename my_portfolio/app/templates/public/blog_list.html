@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Blog — {{ site.site_title }}{% endblock %}
+{% block content %}
+<section class="panel">
+  <h2>// blog <a class="link" href="/blog/rss.xml" style="font-size:0.7rem;">[rss]</a></h2>
+  <div class="grid">
+    {% for post in posts %}
+    <a class="card" href="/blog/{{ post.slug }}">
+      {% if post.cover_image_url %}<img class="card-image" src="{{ post.cover_image_url }}" alt="{{ post.title }}">{% endif %}
+      <h3>{{ post.title }}</h3>
+      <p class="meta">{{ post.published_at.strftime('%Y-%m-%d') if post.published_at else "" }}</p>
+      <p>{{ post.summary }}</p>
+      <div class="tags">
+        {% for tag in post.tag_list %}<span class="tag">{{ tag }}</span>{% endfor %}
+      </div>
+    </a>
+    {% else %}
+    <p>No posts yet.</p>
+    {% endfor %}
+  </div>
+  <div class="pager">
+    {% if has_prev %}<a class="btn" href="/blog?page={{ page - 1 }}">&lt; newer</a>{% endif %}
+    {% if has_next %}<a class="btn" href="/blog?page={{ page + 1 }}">older &gt;</a>{% endif %}
+  </div>
+</section>
+{% endblock %}

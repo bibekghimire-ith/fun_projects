@@ -4,6 +4,7 @@
 <h1>&gt; site settings_</h1>
 {% if saved %}<p class="success">Saved.</p>{% endif %}
 <form method="post" action="/admin/settings" class="form" enctype="multipart/form-data">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
   <label>site title<input type="text" name="site_title" value="{{ site.site_title }}" required></label>
   <label>tagline<input type="text" name="tagline" value="{{ site.tagline }}"></label>
   <label>bio<textarea name="bio" rows="4">{{ site.bio }}</textarea></label>
@@ -22,10 +23,14 @@
   <label>background color<input type="color" name="background_color" value="{{ site.background_color }}"></label>
   <label>text color<input type="color" name="text_color" value="{{ site.text_color }}"></label>
   <label>accent color<input type="color" name="accent_color" value="{{ site.accent_color }}"></label>
-  <p class="meta">Panel backgrounds, borders, and dimmed text are derived
-    automatically from these three colors — no need to set those
-    separately. <a href="/" target="_blank" rel="noopener">Preview the
-    site &gt;</a> in another tab after saving to see the new palette.</p>
+  <p class="meta">Panel backgrounds, borders, dimmed text, and a
+    readable "ink" version of the accent color (used for headings, links,
+    and status text, since a bright accent can be hard to read as plain
+    text) are all derived automatically from these three colors — no need
+    to set those separately. Pick an accent color with some contrast
+    against your background/text choices for the best result.
+    <a href="/" target="_blank" rel="noopener">Preview the site &gt;</a>
+    in another tab after saving to see the new palette.</p>
   <button class="btn" type="submit">save</button>
 </form>
 {% endblock %}

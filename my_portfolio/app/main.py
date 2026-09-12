@@ -5,7 +5,7 @@ from starlette.middleware.sessions import SessionMiddleware
 
 from app.config import get_settings
 from app.database import SessionLocal, init_db
-from app.routers import admin, public
+from app.routers import admin, blog, public
 from app.seed import seed
 
 settings = get_settings()
@@ -28,6 +28,21 @@ app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 app.include_router(public.router)
 app.include_router(admin.router)
+app.include_router(blog.router)
+
+
+@app.middleware("http")
+async def security_headers(request, call_next):
+    """Baseline security headers on every response (BLOG_PLAN.md section 7).
+    Kept minimal and dependency-free: no inline-script CSP is imposed here
+    since it isn't needed by any current template (no inline <script> tags),
+    but the framing/sniffing protections apply everywhere."""
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["Referrer-Policy"] = "same-origin"
+    response.headers.setdefault("Content-Security-Policy", "frame-ancestors 'none'")
+    return response
 
 
 @app.on_event("startup")

@@ -1,0 +1,30 @@
+{% extends "admin/layout.html" %}
+{% block title %}Analytics{% endblock %}
+{% block content %}
+<h1>&gt; analytics_</h1>
+<div class="grid stats">
+  <div class="card"><h3>{{ total_views }}</h3><p>total views (all-time, all posts)</p></div>
+  <div class="card"><h3>{{ posts|length }}</h3><p>posts</p></div>
+</div>
+
+<p class="meta">Views are counted per post per UTC day. No visitor IP
+  address, cookie, device fingerprint, or referrer is ever recorded —
+  only a date and a count.</p>
+
+<table class="admin-table">
+  <thead><tr><th>post</th><th>status</th><th>all-time views</th><th>last 7 days</th><th>last 30 days</th></tr></thead>
+  <tbody>
+    {% for post in posts %}
+    <tr>
+      <td><a href="/admin/posts/{{ post.id }}/edit">{{ post.title }}</a></td>
+      <td><span class="status-pill {{ 'status-published' if post.published else 'status-draft' }}">{{ "published" if post.published else "draft" }}</span></td>
+      <td>{{ post.view_count }}</td>
+      <td>{{ per_post_recent[post.id].last_7_days }}</td>
+      <td>{{ per_post_recent[post.id].last_30_days }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="5">No posts yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

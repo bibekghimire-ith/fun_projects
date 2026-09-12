@@ -9,7 +9,19 @@
     /* Background / text / accent come straight from Site Settings; the
        supporting panel/border/dim-text shades are derived from them here
        so the theme stays coherent for any color choice (falls back to
-       retro.css's static defaults in browsers without color-mix()). */
+       retro.css's static defaults in browsers without color-mix()).
+
+       --accent-ink exists because the raw accent color is chosen to look
+       good as a bright highlight (buttons, meter fills, glows), not as
+       text on --bg — for the shipped default (lime on cream) raw accent
+       text has a contrast ratio of ~1.2:1 against the background, which
+       is barely legible. --accent-ink blends 65% --fg into --accent to
+       get a version dark enough to read as body/heading text (~5:1 by
+       default) while still reading as "the accent color". Anywhere accent
+       is used as TEXT or a text-adjacent border (headings, links, success
+       messages, status pills) uses --accent-ink; raw --accent stays for
+       large fills where something else (button text, meter track) already
+       carries the contrast — see retro.css for the split. */
     :root {
       --bg: {{ site.background_color if site else '#F7F0E6' }};
       --fg: {{ site.text_color if site else '#1D2B1F' }};
@@ -17,6 +29,7 @@
       --bg-panel: color-mix(in srgb, var(--bg), var(--fg) 6%);
       --border: color-mix(in srgb, var(--bg), var(--fg) 18%);
       --fg-dim: color-mix(in srgb, var(--fg), var(--bg) 35%);
+      --accent-ink: color-mix(in srgb, var(--accent), var(--fg) 65%);
     }
   </style>
   {% block extra_head %}{% endblock %}
