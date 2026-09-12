@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Experience — {{ site.site_title }}{% endblock %}
+{% block content %}
+<section class="panel">
+  <h2>// experience</h2>
+  <ul class="timeline">
+    {% for exp in experiences %}
+    <li>
+      <h3>{{ exp.role }} @ {{ exp.company }}</h3>
+      <p class="meta">{{ exp.start_date }} — {{ exp.end_date if exp.end_date else "present" }}{% if exp.location %} · {{ exp.location }}{% endif %}</p>
+      <p>{{ exp.description }}</p>
+    </li>
+    {% else %}
+    <p>No experience entries yet.</p>
+    {% endfor %}
+  </ul>
+</section>
+
+<section class="panel">
+  <h2>// education</h2>
+  <ul class="timeline">
+    {% for edu in education %}
+    <li>
+      <h3>{{ edu.degree }}{% if edu.field %} in {{ edu.field }}{% endif %}</h3>
+      <p class="meta">{{ edu.institution }} · {{ edu.start_date if edu.start_date else "" }} — {{ edu.end_date if edu.end_date else "present" }}</p>
+    </li>
+    {% else %}
+    <p>No education entries yet.</p>
+    {% endfor %}
+  </ul>
+</section>
+{% endblock %}

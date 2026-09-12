@@ -1,0 +1,5 @@
+cp content.example.yaml content.yaml
+# edit content.yaml with your real name, bio, projects, jobs, education, etc.
+
+docker compose cp content.yaml web:/app/content.yaml
+docker compose exec web python scripts/load_content.py

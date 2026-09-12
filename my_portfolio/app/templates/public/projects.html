@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Projects — {{ site.site_title }}{% endblock %}
+{% block content %}
+<section class="panel">
+  <h2>// all projects</h2>
+  <div class="grid">
+    {% for project in projects %}
+    <a class="card" href="/projects/{{ project.slug }}">
+      {% if project.image_url %}<img class="card-image" src="{{ project.image_url }}" alt="{{ project.title }}">{% endif %}
+      <h3>{{ project.title }}</h3>
+      <p>{{ project.summary }}</p>
+      <div class="tags">
+        {% for tech in project.tech_list %}<span class="tag">{{ tech }}</span>{% endfor %}
+      </div>
+    </a>
+    {% else %}
+    <p>No projects yet.</p>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

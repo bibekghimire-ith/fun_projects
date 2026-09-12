@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}{{ site.site_title }} — {{ site.tagline }}{% endblock %}
+{% block content %}
+<section class="hero">
+  {% if site.avatar_url %}<img class="avatar" src="{{ site.avatar_url }}" alt="avatar">{% endif %}
+  <h1 class="glitch">{{ site.site_title }}</h1>
+  <p class="tagline">&gt; {{ site.tagline }}</p>
+  <p class="bio">{{ site.bio }}</p>
+  {% if site.resume_url %}<a class="btn" href="{{ site.resume_url }}" target="_blank" rel="noopener">download résumé</a>{% endif %}
+</section>
+
+{% if featured %}
+<section class="panel">
+  <h2>// featured projects</h2>
+  <div class="grid">
+    {% for project in featured %}
+    <a class="card" href="/projects/{{ project.slug }}">
+      {% if project.image_url %}<img class="card-image" src="{{ project.image_url }}" alt="{{ project.title }}">{% endif %}
+      <h3>{{ project.title }}</h3>
+      <p>{{ project.summary }}</p>
+      <div class="tags">
+        {% for tech in project.tech_list %}<span class="tag">{{ tech }}</span>{% endfor %}
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  <a class="link" href="/projects">view all projects &gt;</a>
+</section>
+{% endif %}
+
+{% if categories %}
+<section class="panel">
+  <h2>// skills</h2>
+  {% for category in categories %}
+  <div class="skill-group">
+    <h3>{{ category.name }}</h3>
+    {% for skill in category.skills %}
+    <div class="skill-row">
+      <span class="skill-name">{{ skill.name }}</span>
+      <div class="meter"><div class="meter-fill" style="width: {{ skill.level }}%"></div></div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endfor %}
+</section>
+{% endif %}
+
+<section class="panel" id="contact">
+  <h2>// contact</h2>
+  <ul class="contact-list">
+    {% if site.email %}<li>email: <a href="mailto:{{ site.email }}">{{ site.email }}</a></li>{% endif %}
+    {% if site.location %}<li>location: {{ site.location }}</li>{% endif %}
+    {% if site.github_url %}<li>github: <a href="{{ site.github_url }}" target="_blank" rel="noopener">{{ site.github_url }}</a></li>{% endif %}
+    {% if site.linkedin_url %}<li>linkedin: <a href="{{ site.linkedin_url }}" target="_blank" rel="noopener">{{ site.linkedin_url }}</a></li>{% endif %}
+    {% if site.twitter_url %}<li>twitter: <a href="{{ site.twitter_url }}" target="_blank" rel="noopener">{{ site.twitter_url }}</a></li>{% endif %}
+  </ul>
+</section>
+{% endblock %}

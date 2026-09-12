@@ -1,0 +1,12 @@
+{% extends "admin/layout.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h1>&gt; welcome, {{ admin_username }}_</h1>
+<div class="grid stats">
+  <div class="card"><h3>{{ counts.projects }}</h3><p>projects</p></div>
+  <div class="card"><h3>{{ counts.skills }}</h3><p>skills</p></div>
+  <div class="card"><h3>{{ counts.experiences }}</h3><p>experience entries</p></div>
+  <div class="card"><h3>{{ counts.education }}</h3><p>education entries</p></div>
+</div>
+<p>Use the nav above to edit site settings, projects, skills, and experience/education. Changes appear on the public site immediately.</p>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends "admin/layout.html" %}
+{% block title %}Site Settings{% endblock %}
+{% block content %}
+<h1>&gt; site settings_</h1>
+{% if saved %}<p class="success">Saved.</p>{% endif %}
+<form method="post" action="/admin/settings" class="form" enctype="multipart/form-data">
+  <label>site title<input type="text" name="site_title" value="{{ site.site_title }}" required></label>
+  <label>tagline<input type="text" name="tagline" value="{{ site.tagline }}"></label>
+  <label>bio<textarea name="bio" rows="4">{{ site.bio }}</textarea></label>
+  <label>avatar url<input type="text" name="avatar_url" value="{{ site.avatar_url }}"></label>
+  {% if site.avatar_url %}<img src="{{ site.avatar_url }}" alt="current avatar" style="max-width:96px;border:1px solid var(--border);">{% endif %}
+  <label>or upload avatar (png/jpg/gif/webp/svg, max 5MB — overrides the URL above)<input type="file" name="avatar_file" accept="image/*"></label>
+  <label>resume url<input type="text" name="resume_url" value="{{ site.resume_url }}"></label>
+  {% if site.resume_url %}<p><a href="{{ site.resume_url }}" target="_blank" rel="noopener">current resume &gt;</a></p>{% endif %}
+  <label>or upload resume (pdf, max 5MB — overrides the URL above)<input type="file" name="resume_file" accept="application/pdf"></label>
+  <label>footer text<input type="text" name="footer_text" value="{{ site.footer_text }}"></label>
+  <label>email<input type="text" name="email" value="{{ site.email }}"></label>
+  <label>location<input type="text" name="location" value="{{ site.location }}"></label>
+  <label>github url<input type="text" name="github_url" value="{{ site.github_url }}"></label>
+  <label>linkedin url<input type="text" name="linkedin_url" value="{{ site.linkedin_url }}"></label>
+  <label>twitter url<input type="text" name="twitter_url" value="{{ site.twitter_url }}"></label>
+  <label>background color<input type="color" name="background_color" value="{{ site.background_color }}"></label>
+  <label>text color<input type="color" name="text_color" value="{{ site.text_color }}"></label>
+  <label>accent color<input type="color" name="accent_color" value="{{ site.accent_color }}"></label>
+  <p class="meta">Panel backgrounds, borders, and dimmed text are derived
+    automatically from these three colors — no need to set those
+    separately. <a href="/" target="_blank" rel="noopener">Preview the
+    site &gt;</a> in another tab after saving to see the new palette.</p>
+  <button class="btn" type="submit">save</button>
+</form>
+{% endblock %}

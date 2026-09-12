@@ -1,0 +1,112 @@
+# Portfolio content template.
+#
+# 1. Copy this file:            cp content.example.yaml content.yaml
+# 2. Edit content.yaml with your real details.
+# 3. Load it into the running app (see README "Bulk-loading content" section).
+#
+# `content.yaml` (your real, filled-in copy) is git-ignored on purpose so you
+# never accidentally commit personal details — only this .example file is
+# version-controlled.
+#
+# Re-running the loader is safe: site_settings fields are merged in, while
+# skills / projects / experience / education are fully REPLACED with
+# whatever is listed below each time you run it. Treat this file as the
+# single source of truth for bulk imports; day-to-day tweaks are easiest
+# through the /admin panel afterwards.
+
+site_settings:
+  site_title: "[Your Name]"
+  tagline: "[e.g. Software / Hardware Engineer]"
+  bio: >
+    [A short paragraph about yourself: what you do, what you're into,
+    what you're looking for. Shown on the homepage under your name.]
+  avatar_url: ""      # e.g. https://example.com/me.png — or leave blank and
+                       # upload one from the admin panel's Site Settings page
+  resume_url: ""       # link to a hosted PDF — or upload one from /admin
+  footer_text: "> built with python, coffee, and a crt glow"
+  email: "[you@example.com]"
+  location: "[City, Country]"
+  github_url: "https://github.com/[yourhandle]"
+  linkedin_url: "https://linkedin.com/in/[yourhandle]"
+  twitter_url: ""
+  background_color: "#F7F0E6"
+  text_color: "#1D2B1F"
+  accent_color: "#BFEA4B"
+  # any hex color; panel/border/dim-text shades are derived from these
+  # automatically — see ADMIN_README.md
+
+# Skill categories, each with its own list of skills. `level` is 0-100 and
+# renders as a retro meter bar. Add as many categories/skills as you like.
+skills:
+  - category: "Languages"
+    order_index: 0
+    items:
+      - { name: "Python", level: 90 }
+      - { name: "C / C++", level: 75 }
+      - { name: "[Another language]", level: 60 }
+
+  - category: "Software"
+    order_index: 1
+    items:
+      - { name: "[e.g. FastAPI / Django / Node.js]", level: 80 }
+      - { name: "[e.g. Docker / Kubernetes]", level: 70 }
+
+  - category: "Hardware"
+    order_index: 2
+    items:
+      - { name: "[e.g. STM32 / embedded C]", level: 65 }
+      - { name: "[e.g. PCB design (KiCad)]", level: 55 }
+
+# One entry per project. `featured: true` shows it on the homepage too.
+# `tech_stack` is a comma-separated list of tags shown on the card.
+projects:
+  - title: "[Example Project Name]"
+    summary: "[One-sentence summary shown on project cards.]"
+    description: >
+      [Full write-up shown on the project's own page: what it does, why you
+      built it, what was interesting/hard about it.]
+    tech_stack: "Python, FastAPI, Docker"
+    repo_url: "https://github.com/[yourhandle]/[repo]"
+    live_url: ""
+    image_url: ""       # or upload one per-project from /admin later
+    featured: true
+    order_index: 0
+
+  - title: "[Another Project]"
+    summary: "[Summary]"
+    description: "[Description]"
+    tech_stack: "C, STM32, KiCad"
+    repo_url: ""
+    live_url: ""
+    image_url: ""
+    featured: false
+    order_index: 1
+
+# Work history, most recent first. Dates are YYYY-MM-DD. Leave end_date
+# blank/omit it for a current/ongoing role.
+experience:
+  - role: "[Job Title]"
+    company: "[Company Name]"
+    location: "[City, Country / Remote]"
+    start_date: "2022-01-01"
+    end_date:               # blank = shown as "present"
+    description: >
+      [What you did in this role — a couple of sentences.]
+    order_index: 0
+
+  - role: "[Previous Job Title]"
+    company: "[Previous Company]"
+    location: "[City, Country]"
+    start_date: "2019-06-01"
+    end_date: "2021-12-31"
+    description: "[What you did.]"
+    order_index: 1
+
+# Education history, most recent first.
+education:
+  - institution: "[University / School Name]"
+    degree: "[e.g. B.Sc.]"
+    field: "[e.g. Computer Engineering]"
+    start_date: "2016-08-01"
+    end_date: "2020-06-01"
+    order_index: 0
