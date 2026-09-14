@@ -3,19 +3,24 @@
 {% block content %}
 <section class="panel">
   <h2>// blog <a class="link" href="/blog/rss.xml" style="font-size:0.7rem;">[rss]</a></h2>
+  {% if active_tag %}
+  <p class="meta">Filtered by category: <span class="tag">{{ active_tag }}</span> &middot; <a class="link" href="/blog">clear filter</a></p>
+  {% endif %}
   <div class="grid">
     {% for post in posts %}
-    <a class="card" href="/blog/{{ post.slug }}">
-      {% if post.cover_image_url %}<img class="card-image" src="{{ post.cover_image_url }}" alt="{{ post.title }}">{% endif %}
-      <h3>{{ post.title }}</h3>
-      <p class="meta">{{ post.published_at.strftime('%Y-%m-%d') if post.published_at else "" }}</p>
-      <p>{{ post.summary }}</p>
+    <div class="card">
+      <a href="/blog/{{ post.slug }}">
+        {% if post.cover_image_url %}<img class="card-image" src="{{ post.cover_image_url }}" alt="{{ post.title }}">{% endif %}
+        <h3>{{ post.title }}</h3>
+        <p class="meta">{{ post.published_at.strftime('%Y-%m-%d') if post.published_at else "" }}{% if post.source_name %} &middot; via {{ post.source_name }}{% endif %}</p>
+        <p>{{ post.summary }}</p>
+      </a>
       <div class="tags">
-        {% for tag in post.tag_list %}<span class="tag">{{ tag }}</span>{% endfor %}
+        {% for tag in post.tag_list %}<a class="tag" href="/blog?tag={{ tag | urlencode }}">{{ tag }}</a>{% endfor %}
       </div>
-    </a>
+    </div>
     {% else %}
-    <p>No posts yet.</p>
+    <p>No posts{% if active_tag %} tagged &ldquo;{{ active_tag }}&rdquo;{% endif %}.</p>
     {% endfor %}
   </div>
   <div class="pager">

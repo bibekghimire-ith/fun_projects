@@ -23,6 +23,11 @@ Base = declarative_base()
 _COLUMN_MIGRATIONS = [
     ("site_settings", "background_color", "VARCHAR(20)", "'#F7F0E6'"),
     ("site_settings", "text_color", "VARCHAR(20)", "'#1D2B1F'"),
+    # Feed ingestion pipeline (FEED_INGESTION_PLAN.md): attribution fields
+    # on posts created from a configured feed source. Blank for
+    # hand-written posts.
+    ("posts", "source_name", "VARCHAR(200)", "''"),
+    ("posts", "source_url", "VARCHAR(500)", "''"),
 ]
 
 
@@ -31,13 +36,28 @@ def _run_column_migrations() -> None:
     if "site_settings" not in inspector.get_table_names():
         return  # brand-new database — create_all() already applied the full model
 
-    existing_columns = {col["name"] for col in inspector.get_columns("site_settings")}
+    existing_columns_by_table: dict[str, set[str]] = {}
 
-    is_first_run_of_this_migration = "background_color" not in existing_columns
+    def _columns_for(table: str) -> set[str]:
+        if table not in existing_columns_by_table:
+            if table not in inspector.get_table_names():
+                existing_columns_by_table[table] = set()
+            else:
+                existing_columns_by_table[table] = {
+                    col["name"] for col in inspector.get_columns(table)
+                }
+        return existing_columns_by_table[table]
+
+    site_settings_columns = _columns_for("site_settings")
+    is_first_run_of_this_migration = "background_color" not in site_settings_columns
 
     with engine.begin() as conn:
         for table, column, ddl_type, default_sql in _COLUMN_MIGRATIONS:
-            if column in existing_columns:
+            table_columns = _columns_for(table)
+            if not table_columns or column in table_columns:
+                # Table doesn't exist yet (create_all() will make it fresh
+                # with the column already present) or the column is
+                # already there -- nothing to backfill.
                 continue
             conn.execute(text(f"ALTER TABLE {table} ADD COLUMN {column} {ddl_type}"))
             conn.execute(text(f"UPDATE {table} SET {column} = {default_sql} WHERE {column} IS NULL"))

@@ -188,3 +188,78 @@
 ## File map (for orientation)
 
 See the "Project layout" section in `README.md`.
+
+## Status: implemented (feed ingestion pipeline)
+
+- [x] Two new tables (`FeedSource`, `IngestedItem`) and two new columns on
+      `Post` (`source_name`, `source_url`) — see `FEED_INGESTION_PLAN.md`
+      for the full design. The new columns are backfilled for existing
+      databases via `_COLUMN_MIGRATIONS` in `app/database.py`, same
+      mechanism as the site-settings color columns.
+- [x] `app/feed_parser.py`: a dependency-free RSS 2.0 / Atom 1.0 parser
+      (stdlib `xml.etree.ElementTree` only — no `feedparser`, since this
+      environment has no package-index network access to verify a new
+      dependency installs). Handles both formats' date formats, falls
+      back to `<link>` when an entry has no guid/id, and raises a single
+      `FeedParseError` on malformed/unrecognized input.
+- [x] `app/ingestion.py`: `run_ingestion()` fetches each enabled source
+      (via stdlib `urllib.request`, 10s timeout, 2 MB response cap),
+      dedupes against `IngestedItem`, sanitizes the feed's own
+      summary/description HTML through a new `sanitize_external_html()`
+      in `app/markdown_utils.py` (same nh3 allowlist as post Markdown),
+      and creates **draft** (`published=False`) posts with a fixed
+      "originally published at ..." attribution line. One source's
+      fetch/parse error is recorded on that source and never blocks the
+      others. The one function that touches the network
+      (`_fetch_feed_bytes`) is isolated so tests can monkeypatch it.
+- [x] Attribution-link escaping: `_build_post_body()` HTML-escapes the
+      source name and restricts the linked URL to `http(s)` schemes only
+      (`_safe_external_link`) — a malicious feed entry cannot smuggle a
+      `javascript:` URI or break out of the `href` attribute via a quote
+      character in its title/link. Verified directly (see below) since
+      this is exactly the kind of bug that's easy to introduce when
+      hand-building an HTML string with an f-string.
+- [x] `scripts/ingest_feeds.py`: cron-runnable CLI wrapper, mirrors the
+      existing `scripts/load_content.py` pattern (own `SessionLocal`
+      session, `sys.path` bootstrap, prints a summary, non-zero exit only
+      if every configured source errored).
+- [x] Admin UI: `/admin/sources` (list + last-run status + run-now),
+      `/admin/sources/new` / `/admin/sources/{id}/edit` (validated form,
+      same re-render-with-error pattern as posts), delete, run-all — all
+      behind `require_admin` + `require_csrf` like every other admin
+      route. Dashboard gained a `sources` count tile.
+- [x] Public: `/blog?tag=<category>` filters the list (case-insensitive
+      substring match on the existing comma-separated `Post.tags`, no
+      schema change); tag pills on the blog list/detail pages are now
+      links to this filter; the post detail page shows the source
+      attribution line when `post.source_url` is set.
+- [x] `README.md` / `ADMIN_README.md` updated with usage instructions
+      (configuring a source, running it manually/via cron, reviewing
+      drafts, browsing by category).
+- [x] `tests/test_smoke.py` extended: feed-parser unit tests against
+      literal RSS/Atom XML (no network), ingestion-pipeline tests with
+      `_fetch_feed_bytes` monkeypatched to a fixed payload (asserts
+      draft-not-published, tags, attribution, sanitization of a `<script>`
+      tag in the feed's own description, dedup on rerun, one source
+      erroring without affecting another), and admin-route
+      auth/CSRF-gating tests for `/admin/sources*`.
+- [x] Verified without a live `pytest` run (same network limitation as
+      the rest of this codebase in this environment — no `fastapi` /
+      `sqlalchemy` / etc. installed here, no package-index access to
+      install them): every new/changed `.py` file passes `py_compile`,
+      every new/changed template parses via a real Jinja2 environment,
+      and — because `app/feed_parser.py` and the pure-python helpers in
+      `app/ingestion.py` (`_build_post_body`, `_safe_external_link`,
+      `_plain_text_excerpt`) have no third-party dependencies — they were
+      **actually executed** against literal RSS/Atom XML fixtures and
+      adversarial inputs (a `<script>`-tag description, a `javascript:`
+      link, a quote-breakout attempt in a feed-supplied title), which is
+      how the href-escaping bug mentioned above was caught and fixed
+      before being reported as done.
+      **Please run `pip install -r requirements-dev.txt && pytest`
+      locally** to get a full pass/fail signal (including the parts that
+      do need `fastapi`/`sqlalchemy`, which weren't executable here)
+      before deploying, and rebuild the Docker image
+      (`docker compose build web && docker compose up -d`) since new
+      Python modules were added (no new third-party dependency, though —
+      `requirements.txt` is unchanged).

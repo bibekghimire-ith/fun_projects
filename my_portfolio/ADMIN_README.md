@@ -118,6 +118,30 @@ UTC calendar day — no IP address, cookie, device fingerprint, or referrer
 is ever recorded, so there's no per-visitor data to review, export, or
 accidentally leak.
 
+### Auto-importing articles from other sites (feed sources)
+
+**Sources** (`/admin/sources`) is a list of RSS/Atom feeds you configure —
+each has a name, a feed URL, and a category. Periodically (via cron, or
+whenever you click **run now**), the pipeline checks each enabled source
+for new articles it hasn't seen before and creates a **draft** post for
+each one: a sanitized excerpt of the feed's own summary, tagged with the
+source's category, with an "originally published at ..." link back to
+the original article. Nothing from a feed is ever auto-published — new
+imports show up in `/admin/posts` as drafts for you to review, edit, or
+delete, same as any post you write by hand.
+
+- **Add a source:** `/admin/sources` → *new source*. The feed URL is the
+  site's RSS/Atom feed (often `<site>/feed` or `<site>/rss.xml` — check
+  the site itself, or its category page, for a feed link).
+- **Run on a schedule:** see `README.md` for the cron line.
+- **Run on demand:** the *run now* button next to a source, or *run all
+  enabled now* at the top of the page.
+- A source's row shows its last run time/status; if a feed fails to fetch
+  or parse, that source shows an error (hover for detail) without
+  affecting any other configured source.
+
+Full design/reasoning: `FEED_INGESTION_PLAN.md`.
+
 ### Bulk-editing via content.yaml
 
 For large changes (re-doing your whole skills list, adding several

@@ -68,3 +68,19 @@ def render_post_html(markdown_text: str) -> str:
         link_rel="noopener noreferrer",
     )
     return clean_html
+
+
+def sanitize_external_html(raw_html: str) -> str:
+    """Sanitize HTML that did NOT come from python-markdown -- specifically,
+    a feed entry's own summary/description HTML (see app/ingestion.py).
+    Same allowlist and nh3 backend as render_post_html(), just skipping the
+    Markdown-rendering step since the input is already HTML, not Markdown.
+    Never trust feed content any less than admin-authored Markdown: this
+    goes through the identical sanitizer before it's ever stored."""
+    return nh3.clean(
+        raw_html or "",
+        tags=_ALLOWED_TAGS,
+        attributes=_ALLOWED_ATTRIBUTES,
+        url_schemes=_ALLOWED_URL_SCHEMES,
+        link_rel="noopener noreferrer",
+    )

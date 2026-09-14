@@ -164,10 +164,68 @@ class Post(Base):
     )
     view_count: Mapped[int] = mapped_column(Integer, default=0)
     order_index: Mapped[int] = mapped_column(Integer, default=0)
+    # Set only for posts created by the feed ingestion pipeline; blank for
+    # hand-written posts. See FEED_INGESTION_PLAN.md.
+    source_name: Mapped[str] = mapped_column(String(200), default="")
+    source_url: Mapped[str] = mapped_column(String(500), default="")
 
     @property
     def tag_list(self) -> list[str]:
         return [t.strip() for t in self.tags.split(",") if t.strip()]
+
+
+class FeedSource(Base):
+    """One configured website/category feed the ingestion pipeline polls
+    for new articles. See FEED_INGESTION_PLAN.md for the full design.
+    """
+
+    __tablename__ = "feed_sources"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(String(150), nullable=False)
+    feed_url: Mapped[str] = mapped_column(String(500), unique=True, nullable=False)
+    category: Mapped[str] = mapped_column(String(80), nullable=False)
+    extra_tags: Mapped[str] = mapped_column(String(300), default="")
+    enabled: Mapped[bool] = mapped_column(Boolean, default=True)
+    max_items_per_run: Mapped[int] = mapped_column(Integer, default=10)
+    last_fetched_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    last_status: Mapped[str] = mapped_column(String(20), default="")
+    last_error: Mapped[str] = mapped_column(String(500), default="")
+    last_imported_count: Mapped[int] = mapped_column(Integer, default=0)
+    order_index: Mapped[int] = mapped_column(Integer, default=0)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+    @property
+    def tag_list(self) -> list[str]:
+        tags = [self.category.strip()] if self.category and self.category.strip() else []
+        tags += [t.strip() for t in self.extra_tags.split(",") if t.strip()]
+        # De-duplicate while preserving order (category first).
+        seen: set[str] = set()
+        unique = []
+        for tag in tags:
+            key = tag.lower()
+            if key not in seen:
+                seen.add(key)
+                unique.append(tag)
+        return unique
+
+
+class IngestedItem(Base):
+    """Dedup ledger: one row per feed entry ever seen for a given source,
+    whether or not it became a Post. Kept separate from Post so dedup
+    survives a post being edited or deleted (FEED_INGESTION_PLAN.md
+    section 3)."""
+
+    __tablename__ = "ingested_items"
+    __table_args__ = (UniqueConstraint("source_id", "guid", name="uq_ingested_source_guid"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    source_id: Mapped[int] = mapped_column(ForeignKey("feed_sources.id"), nullable=False)
+    guid: Mapped[str] = mapped_column(String(500), nullable=False)
+    post_id: Mapped[int | None] = mapped_column(ForeignKey("posts.id"), nullable=True)
+    status: Mapped[str] = mapped_column(String(20), default="imported")
+    detail: Mapped[str] = mapped_column(String(300), default="")
+    fetched_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
 
 class PostView(Base):

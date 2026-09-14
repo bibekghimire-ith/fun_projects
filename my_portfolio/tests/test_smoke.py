@@ -4,6 +4,8 @@ sanitization, slugs, view counting, RSS) behaves correctly."""
 import os
 import re
 
+import pytest
+
 os.environ.setdefault("DATABASE_URL", "sqlite:///./test_portfolio.db")
 os.environ.setdefault("SECRET_KEY", "test-secret")
 os.environ.setdefault("ADMIN_USERNAME", "admin")
@@ -352,3 +354,259 @@ def test_security_headers_present():
     assert response.headers.get("x-content-type-options") == "nosniff"
     assert response.headers.get("x-frame-options") == "DENY"
     assert response.headers.get("referrer-policy") == "same-origin"
+
+
+# ---------------------------------------------------------------------------
+# Feed ingestion pipeline -- see FEED_INGESTION_PLAN.md
+# ---------------------------------------------------------------------------
+
+from app.feed_parser import FeedParseError, parse_feed  # noqa: E402
+from app import ingestion as ingestion_module  # noqa: E402
+from app.ingestion import run_ingestion  # noqa: E402
+from app.models import FeedSource, IngestedItem, Post  # noqa: E402
+from app.database import SessionLocal  # noqa: E402
+
+_SAMPLE_RSS = b"""<?xml version="1.0"?>
+<rss version="2.0"><channel>
+<title>Example Security Blog</title>
+<item>
+  <title>New CVE disclosed in widget</title>
+  <link>https://example.com/articles/cve-widget</link>
+  <guid>https://example.com/articles/cve-widget</guid>
+  <pubDate>Mon, 14 Sep 2026 09:00:00 +0000</pubDate>
+  <description>&lt;p&gt;A researcher found &lt;b&gt;a bug&lt;/b&gt; in widget. &lt;script&gt;alert(1)&lt;/script&gt;&lt;/p&gt;</description>
+  <category>security</category>
+</item>
+<item>
+  <title>Second article, no explicit guid</title>
+  <link>https://example.com/articles/second</link>
+  <pubDate>Sun, 13 Sep 2026 09:00:00 +0000</pubDate>
+  <description>Plain text summary of the second article.</description>
+</item>
+</channel></rss>"""
+
+_SAMPLE_ATOM = b"""<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Example Atom Feed</title>
+  <entry>
+    <title>Atom entry title</title>
+    <id>urn:uuid:abc-123</id>
+    <link rel="alternate" href="https://example.com/atom-entry"/>
+    <published>2026-09-14T10:30:00Z</published>
+    <summary>Plain summary text for the atom entry.</summary>
+    <category term="python"/>
+  </entry>
+</feed>"""
+
+
+def test_feed_parser_rss():
+    entries = parse_feed(_SAMPLE_RSS)
+    assert len(entries) == 2
+    assert entries[0].guid == "https://example.com/articles/cve-widget"
+    assert entries[0].title == "New CVE disclosed in widget"
+    assert entries[0].categories == ["security"]
+    assert entries[0].published is not None and entries[0].published.year == 2026
+    # Second item has no <guid> -- falls back to <link> as the dedup key.
+    assert entries[1].guid == "https://example.com/articles/second"
+
+
+def test_feed_parser_atom():
+    entries = parse_feed(_SAMPLE_ATOM)
+    assert len(entries) == 1
+    assert entries[0].guid == "urn:uuid:abc-123"
+    assert entries[0].link == "https://example.com/atom-entry"
+    assert entries[0].categories == ["python"]
+
+
+def test_feed_parser_rejects_malformed_xml():
+    with pytest.raises(FeedParseError):
+        parse_feed(b"not xml at all <<<")
+
+
+def test_feed_parser_rejects_unsupported_root():
+    with pytest.raises(FeedParseError):
+        parse_feed(b"<rdf:RDF xmlns:rdf='urn:x'></rdf:RDF>")
+
+
+def _make_source(db, feed_url="https://example.com/feed.xml", **overrides) -> FeedSource:
+    source = FeedSource(
+        name=overrides.pop("name", "Example Security Blog"),
+        feed_url=feed_url,
+        category=overrides.pop("category", "security-news"),
+        extra_tags=overrides.pop("extra_tags", ""),
+        enabled=overrides.pop("enabled", True),
+        max_items_per_run=overrides.pop("max_items_per_run", 10),
+    )
+    db.add(source)
+    db.commit()
+    db.refresh(source)
+    return source
+
+
+def test_ingestion_creates_draft_posts_with_attribution_and_tags(monkeypatch):
+    monkeypatch.setattr(ingestion_module, "_fetch_feed_bytes", lambda url: _SAMPLE_RSS)
+    db = SessionLocal()
+    try:
+        source = _make_source(db, feed_url="https://example.com/feed-a.xml")
+        summary = run_ingestion(db, source_id=source.id)
+
+        assert summary.total_imported == 2
+        assert summary.results[0].status == "ok"
+
+        posts = (
+            db.query(Post)
+            .filter(Post.source_name == "Example Security Blog")
+            .order_by(Post.id)
+            .all()
+        )
+        assert len(posts) == 2
+        first = posts[0]
+        assert first.published is False  # drafts, not auto-published
+        assert first.source_url == "https://example.com/articles/cve-widget"
+        assert first.source_name == "Example Security Blog"
+        assert "security-news" in first.tag_list
+        # The sanitizer must have stripped the <script> tag from the feed's
+        # own description before it was ever stored.
+        assert "<script>" not in first.content_html
+        # Attribution is rendered once by blog_detail.html from
+        # source_name/source_url -- it must NOT also be baked into the
+        # stored body (that duplicated the attribution line on the public
+        # page, caught during live verification and fixed).
+        assert "originally published" not in first.content_html.lower()
+
+        db.refresh(source)
+        assert source.last_status == "ok"
+        assert source.last_imported_count == 2
+    finally:
+        db.query(IngestedItem).filter(IngestedItem.source_id == source.id).delete()
+        db.query(Post).filter(Post.source_name == "Example Security Blog").delete()
+        db.query(FeedSource).filter(FeedSource.id == source.id).delete()
+        db.commit()
+        db.close()
+
+
+def test_ingestion_is_idempotent_on_rerun(monkeypatch):
+    monkeypatch.setattr(ingestion_module, "_fetch_feed_bytes", lambda url: _SAMPLE_RSS)
+    db = SessionLocal()
+    try:
+        source = _make_source(db, feed_url="https://example.com/feed-b.xml", name="Rerun Source")
+        first_run = run_ingestion(db, source_id=source.id)
+        second_run = run_ingestion(db, source_id=source.id)
+
+        assert first_run.total_imported == 2
+        assert second_run.total_imported == 0  # every guid already in IngestedItem
+
+        post_count = db.query(Post).filter(Post.source_name == "Rerun Source").count()
+        assert post_count == 2  # not duplicated
+    finally:
+        db.query(IngestedItem).filter(IngestedItem.source_id == source.id).delete()
+        db.query(Post).filter(Post.source_name == "Rerun Source").delete()
+        db.query(FeedSource).filter(FeedSource.id == source.id).delete()
+        db.commit()
+        db.close()
+
+
+def test_ingestion_records_error_without_blocking_other_sources(monkeypatch):
+    def _fetch(url):
+        if "broken" in url:
+            raise OSError("connection refused")
+        return _SAMPLE_ATOM
+
+    monkeypatch.setattr(ingestion_module, "_fetch_feed_bytes", _fetch)
+    db = SessionLocal()
+    try:
+        broken = _make_source(db, feed_url="https://example.com/broken-feed.xml", name="Broken Source")
+        healthy = _make_source(db, feed_url="https://example.com/healthy-feed.xml", name="Healthy Source")
+
+        summary = run_ingestion(db)
+
+        by_name = {r.source_name: r for r in summary.results}
+        assert by_name["Broken Source"].status == "error"
+        assert by_name["Healthy Source"].status == "ok"
+        assert by_name["Healthy Source"].imported == 1
+
+        db.refresh(broken)
+        db.refresh(healthy)
+        assert broken.last_status == "error"
+        assert "connection refused" in broken.last_error
+        assert healthy.last_status == "ok"
+    finally:
+        for s in (broken, healthy):
+            db.query(IngestedItem).filter(IngestedItem.source_id == s.id).delete()
+            db.query(Post).filter(Post.source_name == s.name).delete()
+        db.query(FeedSource).filter(FeedSource.id.in_([broken.id, healthy.id])).delete(
+            synchronize_session=False
+        )
+        db.commit()
+        db.close()
+
+
+def test_admin_sources_require_login():
+    client.post("/admin/logout")
+    response = client.get("/admin/sources", follow_redirects=False)
+    assert response.status_code in (303, 307)
+
+
+def test_admin_source_create_without_csrf_token_is_rejected():
+    _login()
+    response = client.post(
+        "/admin/sources/new",
+        data={
+            "name": "No CSRF Source",
+            "feed_url": "https://example.com/no-csrf-feed.xml",
+            "category": "test",
+            "extra_tags": "",
+            "enabled": "true",
+            "max_items_per_run": 10,
+            "order_index": 0,
+        },
+    )
+    assert response.status_code == 403
+
+
+def test_admin_source_create_and_public_tag_filter():
+    _login()
+    token = _csrf_token("/admin/sources/new")
+    response = client.post(
+        "/admin/sources/new",
+        data={
+            "name": "Filter Test Source",
+            "feed_url": "https://example.com/filter-test-feed.xml",
+            "category": "python-news",
+            "extra_tags": "",
+            "enabled": "true",
+            "max_items_per_run": 10,
+            "order_index": 0,
+            "csrf_token": token,
+        },
+        follow_redirects=False,
+    )
+    assert response.status_code == 303
+
+    sources_page = client.get("/admin/sources")
+    assert sources_page.status_code == 200
+    assert b"Filter Test Source" in sources_page.content
+
+    # A hand-written post tagged "python-news" should show up under the
+    # matching /blog?tag= filter, same code path an ingested post uses.
+    token = _csrf_token("/admin/posts/new")
+    client.post(
+        "/admin/posts/new",
+        data={
+            "title": "Tag Filter Demo Post",
+            "summary": "",
+            "content_markdown": "Content for tag filter test.",
+            "tags": "python-news",
+            "published": "true",
+            "order_index": 0,
+            "csrf_token": token,
+        },
+        follow_redirects=False,
+    )
+
+    filtered = client.get("/blog?tag=python-news")
+    assert filtered.status_code == 200
+    assert b"Tag Filter Demo Post" in filtered.content
+
+    unrelated = client.get("/blog?tag=nonexistent-tag-xyz")
+    assert b"Tag Filter Demo Post" not in unrelated.content

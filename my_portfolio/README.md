@@ -238,3 +238,32 @@ templates with cover-image thumbnails, and an RSS feed. `BLOG_PLAN.md` is
 kept as the design record — see it for the reasoning behind specific
 choices (e.g. why login is exempt from CSRF, why analytics only ever
 stores a date + a count).
+
+## Feed ingestion pipeline
+
+The pipeline described in `FEED_INGESTION_PLAN.md` is implemented:
+configure RSS/Atom feeds per category in `/admin/sources`, and new
+articles are turned into **draft** blog posts (never auto-published) with
+a sanitized excerpt, the source's category as a tag, and an "originally
+published at ..." attribution link back to the original article.
+
+- **Configure a source:** `/admin/sources` → *new source* → give it a
+  name, its feed URL, and a category (which becomes a post tag).
+- **Run it manually:** the *run now* button per source, or *run all
+  enabled now* on the sources page.
+- **Run it on a schedule (cron):**
+  ```
+  */30 * * * *  cd /path/to/my_portfolio && python scripts/ingest_feeds.py >> /var/log/portfolio-ingest.log 2>&1
+  ```
+  or, from Docker: `docker compose exec web python scripts/ingest_feeds.py`.
+- **Review before publishing:** ingested articles land in `/admin/posts`
+  as unpublished drafts, exactly like a hand-written post — edit, retag,
+  or delete before hitting publish.
+- **Browse by category:** `/blog?tag=<category>` filters the public blog
+  list to just that tag; tag pills on the blog list/detail pages are now
+  links to this filter.
+
+See `FEED_INGESTION_PLAN.md` for the full design, including why it uses a
+small dependency-free RSS/Atom parser instead of `feedparser`, the dedup
+strategy, and known limitations (RSS/Atom only, one category per source,
+no full-article scraping).

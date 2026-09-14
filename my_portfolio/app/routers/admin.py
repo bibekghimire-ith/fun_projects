@@ -8,12 +8,17 @@ from slugify import slugify
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
+from urllib.parse import quote
+
 from app.deps import get_db, get_site_settings, require_admin
+from app.ingestion import run_ingestion
 from app.markdown_utils import render_post_html
 from app.models import (
     AdminUser,
     Education,
     Experience,
+    FeedSource,
+    IngestedItem,
     Post,
     PostView,
     Project,
@@ -182,6 +187,7 @@ def dashboard(
         "experiences": db.query(Experience).count(),
         "education": db.query(Education).count(),
         "posts": db.query(Post).count(),
+        "sources": db.query(FeedSource).count(),
     }
     return render_admin(request, "admin/dashboard.html", {"admin_username": admin_username, "counts": counts})
 
@@ -852,3 +858,200 @@ def _timedelta(days: int):
     from datetime import timedelta
 
     return timedelta(days=days)
+
+
+# ---------------------------------------------------------------------------
+# Feed sources (ingestion pipeline) -- see FEED_INGESTION_PLAN.md
+# ---------------------------------------------------------------------------
+
+_MAX_ITEMS_PER_RUN_CEILING = 50
+
+
+def _validate_source_fields(name: str, feed_url: str, category: str, extra_tags: str, max_items_per_run: int) -> str | None:
+    if not name.strip():
+        return "Name is required."
+    if len(name) > 150:
+        return "Name must be 150 characters or fewer."
+    if not feed_url.strip():
+        return "Feed URL is required."
+    if len(feed_url) > 500:
+        return "Feed URL must be 500 characters or fewer."
+    if not feed_url.startswith("http://") and not feed_url.startswith("https://"):
+        return "Feed URL must start with http:// or https://."
+    if not category.strip():
+        return "Category is required."
+    if len(category) > 80:
+        return "Category must be 80 characters or fewer."
+    if len(extra_tags) > 300:
+        return "Extra tags must be 300 characters or fewer."
+    if not (1 <= max_items_per_run <= _MAX_ITEMS_PER_RUN_CEILING):
+        return f"Max items per run must be between 1 and {_MAX_ITEMS_PER_RUN_CEILING}."
+    return None
+
+
+def _source_form_context(source_id, name, feed_url, category, extra_tags, enabled, max_items_per_run):
+    """Not-yet-saved FeedSource-shaped object so a failed validation can
+    re-render the form with exactly what the admin typed (same pattern as
+    _post_form_context above)."""
+    return FeedSource(
+        id=source_id,
+        name=name,
+        feed_url=feed_url,
+        category=category,
+        extra_tags=extra_tags,
+        enabled=enabled,
+        max_items_per_run=max_items_per_run,
+    )
+
+
+@router.get("/sources")
+def sources_admin(
+    request: Request, db: Session = Depends(get_db), admin_username: str = Depends(require_admin)
+):
+    sources = db.query(FeedSource).order_by(FeedSource.order_index, FeedSource.name).all()
+    run_summary = request.query_params.get("run_summary", "")
+    return render_admin(
+        request, "admin/sources_list.html", {"sources": sources, "run_summary": run_summary}
+    )
+
+
+@router.get("/sources/new")
+def source_new_form(request: Request, admin_username: str = Depends(require_admin)):
+    return render_admin(request, "admin/source_form.html", {"source": None, "error": None})
+
+
+@router.get("/sources/{source_id}/edit")
+def source_edit_form(
+    source_id: int,
+    request: Request,
+    db: Session = Depends(get_db),
+    admin_username: str = Depends(require_admin),
+):
+    source = db.get(FeedSource, source_id)
+    return render_admin(request, "admin/source_form.html", {"source": source, "error": None})
+
+
+@router.post("/sources/new")
+def source_create(
+    request: Request,
+    name: str = Form(...),
+    feed_url: str = Form(...),
+    category: str = Form(...),
+    extra_tags: str = Form(""),
+    enabled: bool = Form(False),
+    max_items_per_run: int = Form(10),
+    order_index: int = Form(0),
+    db: Session = Depends(get_db),
+    admin_username: str = Depends(require_admin),
+    _csrf: None = Depends(require_csrf),
+):
+    error = _validate_source_fields(name, feed_url, category, extra_tags, max_items_per_run)
+    if error is None and db.query(FeedSource).filter(FeedSource.feed_url == feed_url).first() is not None:
+        error = "A source with this feed URL already exists."
+
+    if error:
+        preview = _source_form_context(None, name, feed_url, category, extra_tags, enabled, max_items_per_run)
+        return render_admin(request, "admin/source_form.html", {"source": preview, "error": error}, status_code=400)
+
+    source = FeedSource(
+        name=name,
+        feed_url=feed_url,
+        category=category,
+        extra_tags=extra_tags,
+        enabled=enabled,
+        max_items_per_run=max_items_per_run,
+        order_index=order_index,
+    )
+    db.add(source)
+    db.commit()
+    return RedirectResponse("/admin/sources", status_code=303)
+
+
+@router.post("/sources/{source_id}/edit")
+def source_update(
+    source_id: int,
+    request: Request,
+    name: str = Form(...),
+    feed_url: str = Form(...),
+    category: str = Form(...),
+    extra_tags: str = Form(""),
+    enabled: bool = Form(False),
+    max_items_per_run: int = Form(10),
+    order_index: int = Form(0),
+    db: Session = Depends(get_db),
+    admin_username: str = Depends(require_admin),
+    _csrf: None = Depends(require_csrf),
+):
+    source = db.get(FeedSource, source_id)
+    if source is None:
+        return RedirectResponse("/admin/sources", status_code=303)
+
+    error = _validate_source_fields(name, feed_url, category, extra_tags, max_items_per_run)
+    if error is None:
+        duplicate = (
+            db.query(FeedSource)
+            .filter(FeedSource.feed_url == feed_url, FeedSource.id != source_id)
+            .first()
+        )
+        if duplicate is not None:
+            error = "A source with this feed URL already exists."
+
+    if error:
+        preview = _source_form_context(
+            source.id, name, feed_url, category, extra_tags, enabled, max_items_per_run
+        )
+        return render_admin(request, "admin/source_form.html", {"source": preview, "error": error}, status_code=400)
+
+    source.name = name
+    source.feed_url = feed_url
+    source.category = category
+    source.extra_tags = extra_tags
+    source.enabled = enabled
+    source.max_items_per_run = max_items_per_run
+    source.order_index = order_index
+    db.add(source)
+    db.commit()
+    return RedirectResponse("/admin/sources", status_code=303)
+
+
+@router.post("/sources/{source_id}/delete")
+def source_delete(
+    source_id: int,
+    db: Session = Depends(get_db),
+    admin_username: str = Depends(require_admin),
+    _csrf: None = Depends(require_csrf),
+):
+    source = db.get(FeedSource, source_id)
+    if source is not None:
+        db.query(IngestedItem).filter(IngestedItem.source_id == source_id).delete()
+        db.delete(source)
+        db.commit()
+    return RedirectResponse("/admin/sources", status_code=303)
+
+
+@router.post("/sources/run")
+def sources_run_all(
+    db: Session = Depends(get_db),
+    admin_username: str = Depends(require_admin),
+    _csrf: None = Depends(require_csrf),
+):
+    """Run ingestion for every enabled source -- the manual counterpart to
+    the cron-scheduled scripts/ingest_feeds.py (FEED_INGESTION_PLAN.md
+    section 6)."""
+    summary = run_ingestion(db)
+    label = quote(f"{summary.total_imported} imported")
+    return RedirectResponse(f"/admin/sources?run_summary={label}", status_code=303)
+
+
+@router.post("/sources/{source_id}/run")
+def source_run_one(
+    source_id: int,
+    db: Session = Depends(get_db),
+    admin_username: str = Depends(require_admin),
+    _csrf: None = Depends(require_csrf),
+):
+    summary = run_ingestion(db, source_id=source_id)
+    imported = summary.total_imported
+    errored = summary.any_errors
+    label = quote("error" if errored else f"{imported} imported")
+    return RedirectResponse(f"/admin/sources?run_summary={label}", status_code=303)

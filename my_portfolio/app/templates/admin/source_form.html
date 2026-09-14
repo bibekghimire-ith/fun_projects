@@ -1,0 +1,19 @@
+{% extends "admin/layout.html" %}
+{% block title %}{{ "Edit" if source else "New" }} Feed Source{% endblock %}
+{% block content %}
+<h1>&gt; {{ "edit" if source else "new" }} feed source_</h1>
+{% if error %}<p class="error">{{ error }}</p>{% endif %}
+<form method="post" action="{{ '/admin/sources/%d/edit' % source.id if source else '/admin/sources/new' }}" class="form">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <label>name (shown as attribution, e.g. "Krebs on Security")<input type="text" name="name" value="{{ source.name if source else '' }}" required maxlength="150"></label>
+  <label>feed url (RSS or Atom, e.g. https://example.com/category/security/feed)<input type="text" name="feed_url" value="{{ source.feed_url if source else '' }}" required maxlength="500"></label>
+  <label>category (becomes a post tag on every article from this source)<input type="text" name="category" value="{{ source.category if source else '' }}" required maxlength="80"></label>
+  <label>extra tags (comma-separated, optional, added alongside category)<input type="text" name="extra_tags" value="{{ source.extra_tags if source else '' }}" maxlength="300"></label>
+  <label>max new items imported per run (1-50 — caps the review queue on a source's first run)<input type="number" name="max_items_per_run" value="{{ source.max_items_per_run if source else 10 }}" min="1" max="50"></label>
+  <label class="checkbox"><input type="checkbox" name="enabled" value="true" {{ "checked" if source is none or source.enabled else "" }}> enabled</label>
+  <label>order index<input type="number" name="order_index" value="{{ source.order_index if source else 0 }}"></label>
+  <p class="meta">Ingested articles always land as <strong>unpublished drafts</strong> in
+    <a href="/admin/posts">posts</a> — nothing from a feed goes live until you review and publish it.</p>
+  <button class="btn" type="submit">save</button>
+</form>
+{% endblock %}

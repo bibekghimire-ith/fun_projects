@@ -46,17 +46,28 @@ def _record_view(db: Session, post: Post) -> None:
 def blog_list(
     request: Request,
     page: int = 1,
+    tag: str = "",
     db: Session = Depends(get_db),
     site=Depends(get_site_settings),
 ):
     page = max(1, page)
-    query = (
-        db.query(Post)
-        .filter(Post.published.is_(True))
-        .order_by(Post.published_at.desc(), Post.order_index)
-    )
+    tag = tag.strip()
+    query = db.query(Post).filter(Post.published.is_(True))
+    if tag:
+        # Post.tags is a plain comma-separated string (same pattern as
+        # Project.tech_stack) -- a simple case-insensitive substring match
+        # is enough for the tag pages this powers (/blog?tag=...), matching
+        # how tag_list itself just splits on commas rather than needing a
+        # join table. See FEED_INGESTION_PLAN.md section 8.
+        query = query.filter(Post.tags.ilike(f"%{tag}%"))
+    query = query.order_by(Post.published_at.desc(), Post.order_index)
     total = query.count()
     posts = query.offset((page - 1) * _POSTS_PER_PAGE).limit(_POSTS_PER_PAGE).all()
+    # Note: the ilike filter above is a substring match (so "?tag=python"
+    # would also match a tag like "python3") -- consistent with tags being
+    # a plain comma-separated string rather than a normalized join table
+    # (BLOG_PLAN.md), and good enough for the small, admin-curated tag
+    # vocabulary this site actually uses.
     has_next = page * _POSTS_PER_PAGE < total
     has_prev = page > 1
     return templates.TemplateResponse(
@@ -68,6 +79,7 @@ def blog_list(
             "page": page,
             "has_next": has_next,
             "has_prev": has_prev,
+            "active_tag": tag,
         },
     )
 

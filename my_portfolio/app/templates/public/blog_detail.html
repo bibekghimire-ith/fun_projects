@@ -10,8 +10,11 @@
   </p>
   {% if post.cover_image_url %}<img class="project-image" src="{{ post.cover_image_url }}" alt="{{ post.title }}">{% endif %}
   <div class="tags">
-    {% for tag in post.tag_list %}<span class="tag">{{ tag }}</span>{% endfor %}
+    {% for tag in post.tag_list %}<a class="tag" href="/blog?tag={{ tag | urlencode }}">{{ tag }}</a>{% endfor %}
   </div>
+  {% if post.source_url %}
+  <p class="meta">Originally published at <a class="link" href="{{ post.source_url }}" rel="noopener noreferrer">{{ post.source_name or post.source_url }}</a>.</p>
+  {% endif %}
   <div class="prose">
     {{ post.content_html | safe }}
   </div>

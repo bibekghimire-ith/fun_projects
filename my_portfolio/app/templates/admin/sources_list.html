@@ -1,0 +1,50 @@
+{% extends "admin/layout.html" %}
+{% block title %}Feed Sources{% endblock %}
+{% block content %}
+<h1>&gt; feed sources_</h1>
+<p class="meta">Configured RSS/Atom feeds the ingestion pipeline polls. New
+  articles land as <strong>draft</strong> posts in
+  <a href="/admin/posts">posts</a> for you to review before publishing —
+  see <code>FEED_INGESTION_PLAN.md</code>.</p>
+
+{% if run_summary %}<p class="success">Run result: {{ run_summary }}</p>{% endif %}
+
+<a class="btn" href="/admin/sources/new">+ new source</a>
+<form method="post" action="/admin/sources/run" style="display:inline">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <button class="btn" type="submit">run all enabled now</button>
+</form>
+
+<table class="admin-table">
+  <thead>
+    <tr><th>name</th><th>feed url</th><th>category</th><th>status</th><th>last run</th><th>imported</th><th></th></tr>
+  </thead>
+  <tbody>
+    {% for source in sources %}
+    <tr>
+      <td><a href="/admin/sources/{{ source.id }}/edit">{{ source.name }}</a></td>
+      <td style="max-width:260px;overflow-wrap:anywhere;">{{ source.feed_url }}</td>
+      <td>{{ source.category }}</td>
+      <td>
+        <span class="status-pill {{ 'status-published' if source.enabled else 'status-draft' }}">{{ "enabled" if source.enabled else "disabled" }}</span>
+        {% if source.last_status == "error" %}<br><span class="error" title="{{ source.last_error }}">last run errored</span>{% endif %}
+      </td>
+      <td>{{ source.last_fetched_at.strftime('%Y-%m-%d %H:%M') if source.last_fetched_at else "never" }}</td>
+      <td>{{ source.last_imported_count }}</td>
+      <td>
+        <form method="post" action="/admin/sources/{{ source.id }}/run" style="display:inline">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <button class="link-btn" type="submit">run now</button>
+        </form>
+        <form method="post" action="/admin/sources/{{ source.id }}/delete" onsubmit="return confirm('Delete this source? Its dedup history will also be removed.');" style="display:inline">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <button class="link-btn" type="submit">delete</button>
+        </form>
+      </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="7">No feed sources configured yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
